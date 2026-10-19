@@ -36,7 +36,7 @@ export class LancherosController {
   @Get(':id')
   @ApiOperation({ summary: 'Obtener un lanchero por su ID' })
   findOne(@Param('id') id: string) {
-    return this.lancherosService.findOne(+id);
+    return this.lancherosService.findOne(id);
   }
 
   @Patch(':id')
@@ -45,12 +45,12 @@ export class LancherosController {
     @Param('id') id: string,
     @Body() updateLancheroDto: UpdateLancheroDto,
   ) {
-    return this.lancherosService.update(+id, updateLancheroDto);
+    return this.lancherosService.update(id, updateLancheroDto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Eliminar un lanchero' })
   remove(@Param('id') id: string) {
-    return this.lancherosService.remove(+id);
+    return this.lancherosService.remove(id);
   }
 }
