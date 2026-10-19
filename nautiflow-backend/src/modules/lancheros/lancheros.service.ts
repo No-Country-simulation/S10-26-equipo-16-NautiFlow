@@ -19,14 +19,14 @@ export class LancherosService {
 
   async findAll(): Promise<Lanchero[]> {
     return await this.lancheroRepository.find({
-      relations: ['boats'],
+      relations: { boats: true },
     });
   }
 
   async findOne(id: string): Promise<Lanchero> {
     const lanchero = await this.lancheroRepository.findOne({
       where: { id },
-      relations: ['boats'],
+      relations: { boats: true },
     });
 
     if (!lanchero) {
@@ -36,7 +36,10 @@ export class LancherosService {
     return lanchero;
   }
 
-  async update(id: string, updateLancheroDto: UpdateLancheroDto): Promise<Lanchero> {
+  async update(
+    id: string,
+    updateLancheroDto: UpdateLancheroDto,
+  ): Promise<Lanchero> {
     const lanchero = await this.findOne(id);
     this.lancheroRepository.merge(lanchero, updateLancheroDto);
     return await this.lancheroRepository.save(lanchero);
