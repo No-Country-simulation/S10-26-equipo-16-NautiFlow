@@ -8,7 +8,6 @@ import {
 } from 'typeorm';
 import { Boat } from './boat.entity';
 
-// Enum para el estado de verificación requerido por el panel admin
 export enum VerificationStatus {
   PENDING = 'PENDING',
   VERIFIED = 'VERIFIED',
@@ -24,16 +23,14 @@ export class Lanchero {
   nombre: string;
 
   @Column({ type: 'varchar', length: 150, unique: true })
-  telefono: string; // Crucial para que el admin lo contacte por WhatsApp
+  telefono: string;
 
-  // URLs de los documentos subidos (almacenados en Cloudinary, Supabase o S3)
   @Column({ type: 'varchar', length: 30 })
   licenciaUrl: string;
 
   @Column({ type: 'varchar', nullable: true })
   antecedentesPenalesUrl: string;
 
-  // Estado que cambia el Administrador en el Panel de Verificación
   @Column({
     type: 'enum',
     enum: VerificationStatus,
