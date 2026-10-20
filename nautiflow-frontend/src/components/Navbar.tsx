@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 export default function Navbar() {
   return (
     <div className="drawer">
@@ -38,9 +40,8 @@ export default function Navbar() {
 
           <div className="hidden flex-none lg:block">
             <ul className="menu menu-horizontal">
-              <li><a href="/">Inicio</a></li>
-              <li><a href="/about">Acerca de</a></li>
-              <li><a href="/about">Soy lanchero</a></li>
+              <li><Link to="/">Explorar lanchas</Link></li>
+              <li><a href="/boat-register">Soy lanchero</a></li>
             </ul>
           </div>
           
@@ -56,9 +57,8 @@ export default function Navbar() {
         />
 
         <ul className="menu min-h-full w-80 bg-base-200 p-4 pt-20">
-          <li><a href="/">Inicio</a></li>
-          <li><a href="/about">Acerca de</a></li>
-         <li><a href="/about">Soy lanchero</a></li>
+          <li><Link to="/">Explorar lanchas</Link></li>
+         <li><a href="/boat-register">Soy lanchero</a></li>
         </ul>
 
       </div>

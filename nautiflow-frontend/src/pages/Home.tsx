@@ -1,9 +1,14 @@
-import PageContainer from "../components/PageContainer";
+
+import BoatsPage from "../components/landing/BoatPage"
+import Hero from "../components/landing/Hero"
 
 export default function Home (){
     return (
-        <PageContainer>
-            <h1 > this is homepage</h1>
-        </PageContainer>
+        <>
+        <Hero/>
+        <div>
+        <BoatsPage/>
+        </div>
+        </>
     )
 }
