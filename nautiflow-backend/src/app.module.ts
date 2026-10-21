@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { LancherosModule } from './modules/lancheros/lancheros.module';
 import { TripsModule } from './modules/trips/trips.module';
 import { getDatabaseConfig } from './config/database.config';
+import { EmptyLegsModule } from './modules/empty-legs/empty-legs.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { getDatabaseConfig } from './config/database.config';
     }),
     LancherosModule,
     TripsModule,
+    EmptyLegsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
