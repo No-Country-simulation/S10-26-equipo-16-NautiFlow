@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { EmptyLeg, EmptyLegStatus } from './entities/empty-leg.entity';
-import { Boat } from '../lancheros/entities/boat.entity';
+import { Boat } from '../boat-operators/entities/boat.entity';
 import { CreateEmptyLegDto } from './dto/create-empty-leg.dto';
 import { UpdateEmptyLegDto } from './dto/update-empty-leg.dto';
 

@@ -7,9 +7,9 @@ import {
   IsPhoneNumber,
 } from 'class-validator';
 
-import { VerificationStatus } from '../entities/lanchero.entity';
+import { VerificationStatus } from '../entities/boat-operator.entity';
 
-export class CreateLancheroDto {
+export class CreateBoatOperatorDto {
   @ApiProperty({ example: 'Carlos Rodríguez' })
   @IsString()
   @IsNotEmpty()

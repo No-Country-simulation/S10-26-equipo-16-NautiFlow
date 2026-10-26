@@ -3,7 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { LancherosModule } from './modules/lancheros/lancheros.module';
+import { BoatOperatorsModule } from './modules/boat-operators/boat-operators.module';
 import { TripsModule } from './modules/trips/trips.module';
 import { getDatabaseConfig } from './config/database.config';
 import { EmptyLegsModule } from './modules/empty-legs/empty-legs.module';
@@ -18,7 +18,7 @@ import { EmptyLegsModule } from './modules/empty-legs/empty-legs.module';
       inject: [ConfigService],
       useFactory: getDatabaseConfig,
     }),
-    LancherosModule,
+    BoatOperatorsModule,
     TripsModule,
     EmptyLegsModule,
   ],

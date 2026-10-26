@@ -7,7 +7,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Lanchero } from './lanchero.entity';
+import { BoatOperator } from './boat-operator.entity';
 
 @Entity('boats')
 export class Boat {
@@ -32,15 +32,14 @@ export class Boat {
   @Column({ type: 'boolean', default: true })
   activa: boolean; // Para saber si está disponible en la flota general
 
-  // Relación: La lancha pertenece a un lanchero
-  @ManyToOne(() => Lanchero, (lanchero) => lanchero.boats, {
+  @ManyToOne(() => BoatOperator, (boatOperator) => boatOperator.boats, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'lancheroId' })
-  lanchero: Lanchero;
+  boatOperator: BoatOperator;
 
-  @Column()
-  lancheroId: string;
+  @Column({ name: 'lancheroId' })
+  boatOperatorId: string;
 
   @CreateDateColumn()
   createdAt: Date;

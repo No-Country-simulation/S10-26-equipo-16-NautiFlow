@@ -7,7 +7,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Boat } from '../../lancheros/entities/boat.entity';
+import { Boat } from '../../boat-operators/entities/boat.entity';
 
 export enum TripStatus {
   PENDING = 'PENDING',
