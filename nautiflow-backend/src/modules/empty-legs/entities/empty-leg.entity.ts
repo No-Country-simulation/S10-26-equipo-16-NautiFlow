@@ -7,13 +7,13 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Boat } from '../../lancheros/entities/boat.entity';
+import { Boat } from '../../boat-operators/entities/boat.entity';
 
 export enum EmptyLegStatus {
   AVAILABLE = 'AVAILABLE',
   ASSIGNED = 'ASSIGNED',
-  COMPLETED = "COMPLETED",
-  CANCELLED = "CANCELLED",
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
 }
 
 @Entity('empty_legs')

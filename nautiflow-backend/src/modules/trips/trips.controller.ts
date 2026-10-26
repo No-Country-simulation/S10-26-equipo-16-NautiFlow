@@ -7,10 +7,11 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { TripsService } from './trips.service';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { UpdateTripDto } from './dto/update-trip.dto';
+import { AssignBoatDto } from './dto/assign-boat.dto';
 
 @ApiTags('trips')
 @Controller('trips')
@@ -41,24 +42,17 @@ export class TripsController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Actualizar los datos de un viaje' })
-  update(
-    @Param('id') id: string,
-    @Body() updateTripDto: UpdateTripDto,
-  ) {
+  update(@Param('id') id: string, @Body() updateTripDto: UpdateTripDto) {
     return this.tripsService.update(id, updateTripDto);
   }
 
   @Patch(':id/assign-boat')
-  @ApiOperation({ summary: 'Asignar manualmente una lancha a un viaje' })
-  @ApiResponse({
-    status: 200,
-    description: 'Lancha asignada exitosamente al viaje.',
+  @ApiOperation({
+    summary: 'Asignar manualmente una lancha a un viaje',
   })
-  assignBoat(
-    @Param('id') id: string,
-    @Body('boatId') boatId: string,
-  ) {
-    return this.tripsService.assignBoat(id, boatId);
+  @ApiBody({ type: AssignBoatDto })
+  assignBoat(@Param('id') id: string, @Body() dto: AssignBoatDto) {
+    return this.tripsService.assignBoat(id, dto.boatId);
   }
 
   @Delete(':id')

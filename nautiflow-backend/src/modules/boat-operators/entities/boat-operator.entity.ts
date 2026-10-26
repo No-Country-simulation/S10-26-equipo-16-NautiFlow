@@ -15,7 +15,7 @@ export enum VerificationStatus {
 }
 
 @Entity('lancheros')
-export class Lanchero {
+export class BoatOperator {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -38,7 +38,7 @@ export class Lanchero {
   })
   estadoVerificacion: VerificationStatus;
 
-  @OneToMany(() => Boat, (boat) => boat.lanchero, { cascade: true })
+  @OneToMany(() => Boat, (boat) => boat.boatOperator, { cascade: true })
   boats: Boat[];
 
   @CreateDateColumn()

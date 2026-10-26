@@ -19,7 +19,7 @@ async function bootstrap() {
       'Documentación oficial del back-office de agencias de lanchas',
     )
     .setVersion('1.0')
-    .addTag('lancheros')
+    .addTag('boat-operators')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
