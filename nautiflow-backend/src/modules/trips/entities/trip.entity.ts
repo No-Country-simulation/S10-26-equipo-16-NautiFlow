@@ -3,11 +3,13 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+  OneToMany,
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Boat } from '../../boat-operators/entities/boat.entity';
+import { Review } from '../../reviews/entities/review.entity';
 
 export enum TripStatus {
   PENDING = 'PENDING',
@@ -47,6 +49,9 @@ export class Trip {
 
   @Column({ type: 'uuid', nullable: true })
   boatId: string;
+
+  @OneToMany(() => Review, (review) => review.trip)
+  reviews: Review[];
 
   @CreateDateColumn()
   createdAt: Date;

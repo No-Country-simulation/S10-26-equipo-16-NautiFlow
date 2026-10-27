@@ -7,6 +7,7 @@ import { BoatOperatorsModule } from './modules/boat-operators/boat-operators.mod
 import { TripsModule } from './modules/trips/trips.module';
 import { getDatabaseConfig } from './config/database.config';
 import { EmptyLegsModule } from './modules/empty-legs/empty-legs.module';
+import { ReviewsModule } from './modules/reviews/reviews.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { EmptyLegsModule } from './modules/empty-legs/empty-legs.module';
     BoatOperatorsModule,
     TripsModule,
     EmptyLegsModule,
+    ReviewsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

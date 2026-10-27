@@ -32,6 +32,9 @@ export class Boat {
   @Column({ type: 'boolean', default: true })
   activa: boolean; // Para saber si está disponible en la flota general
 
+  @Column({ type: 'decimal', precision: 3, scale: 2, default: 0 })
+  promedioCalificaciones: number;
+
   @ManyToOne(() => BoatOperator, (boatOperator) => boatOperator.boats, {
     onDelete: 'CASCADE',
   })
