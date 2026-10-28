@@ -26,6 +26,7 @@ async function bootstrap() {
     )
     .setVersion('1.0')
     .addTag('boat-operators')
+    .addTag('admin-verifications')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
