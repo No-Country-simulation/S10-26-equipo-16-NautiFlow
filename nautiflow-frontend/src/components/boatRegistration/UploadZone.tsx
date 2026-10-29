@@ -1,5 +1,5 @@
 import { Upload } from "lucide-react";
-import type { UploadZoneProps } from "./boatFormTypes";
+import type { UploadZoneProps } from "./BoatFormTypes";
 
 export default function UploadZone({
   title,

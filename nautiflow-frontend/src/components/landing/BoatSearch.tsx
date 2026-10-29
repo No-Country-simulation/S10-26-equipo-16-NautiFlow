@@ -1,5 +1,4 @@
-
-import { useState, type FormEvent } from "react";
+import { useState, type SubmitEvent } from "react";
 import { MapPin, Search, Star, X } from "lucide-react";
 
 export interface BoatSearchFilters {
@@ -14,11 +13,7 @@ interface BoatSearchProps {
   loading?: boolean;
 }
 
-const DEFAULT_ZONES = [
-  "Cancún",
-  "Isla Mujeres",
-  "Cozumel",
-];
+const DEFAULT_ZONES = ["Cancún", "Isla Mujeres", "Cozumel"];
 
 export default function BoatSearch({
   onSearch,
@@ -29,7 +24,7 @@ export default function BoatSearch({
   const [zone, setZone] = useState("");
   const [rating, setRating] = useState(0);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     onSearch({
@@ -112,9 +107,7 @@ export default function BoatSearch({
             <select
               id="boat-rating"
               value={rating}
-              onChange={(event) =>
-                setRating(Number(event.target.value))
-              }
+              onChange={(event) => setRating(Number(event.target.value))}
               className="select select-ghost h-auto min-h-0 w-full px-0 py-0 text-sm focus:outline-none"
             >
               <option value={0}>Todas </option>
@@ -148,7 +141,6 @@ export default function BoatSearch({
               onChange={(event) => setSearch(event.target.value)}
               className="input input-ghost h-auto min-h-0 w-full px-0 py-0 text-sm focus:outline-none"
             />
-            
           </div>
         </div>
 
@@ -163,7 +155,7 @@ export default function BoatSearch({
             {loading ? "Buscando..." : "Buscar lanchas"}
           </button>
 
-                <button
+          <button
             type="button"
             onClick={handleClear}
             disabled={loading}
@@ -174,9 +166,7 @@ export default function BoatSearch({
             Limpiar filtros
           </button>
         </div>
-        
       </form>
-
     </section>
   );
 }

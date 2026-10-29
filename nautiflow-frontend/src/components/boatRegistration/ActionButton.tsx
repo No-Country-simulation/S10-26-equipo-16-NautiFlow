@@ -1,5 +1,5 @@
 
-import type { ActionButtonProps } from "./boatFormTypes";
+import type { ActionButtonProps } from "./BoatFormTypes";
 
 export default function ActionButton({
   children,

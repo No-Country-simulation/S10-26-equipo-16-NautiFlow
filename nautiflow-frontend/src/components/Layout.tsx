@@ -6,7 +6,7 @@ import BoatRegister from "../pages/BoatRegister";
 
 export default function Layout() {
   return (
-    <main className="bg-base-300">
+    <main>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/admin-panel" element={<AdminPanel/>} />
