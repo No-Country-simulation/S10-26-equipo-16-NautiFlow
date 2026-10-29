@@ -1,11 +1,10 @@
-
-import { useState } from "react";
-import BoatSearch, {
-  type BoatSearchFilters,
-} from "./BoatSearch";
+import { useEffect, useState } from "react";
+import BoatSearch, { type BoatSearchFilters } from "./BoatSearch";
+import { Star } from "lucide-react";
+import { BoatOperatorService } from "../../services/BoatOperator.Service";
 
 interface Boat {
-  id: number;
+  id: string | number;
   name: string;
   captain: string;
   zone: string;
@@ -14,55 +13,86 @@ interface Boat {
   image: string;
 }
 
-const MOCK_BOATS: Boat[] = [
-  {
-    id: 1,
-    name: "Caribe Explorer",
-    captain: "Miguel Torres",
-    zone: "Cancún",
-    rating: 4.9,
-    capacity: 8,
-    image: "https://img.magnific.com/free-photo/shot-abandoned-broken-boat-left-by-riverbank-surrounded-by-wheat-field_181624-25337.jpg",
-  },
-  {
-    id: 2,
-    name: "Isla Paradise",
-    captain: "Ana Rodríguez",
-    zone: "Isla Mujeres",
-    rating: 4.8,
-    capacity: 12,
-    image: "https://placehold.co/600x400?text=Isla+Paradise",
-  },
-  {
-    id: 3,
-    name: "Cozumel Blue",
-    captain: "Jorge Hernández",
-    zone: "Cozumel",
-    rating: 4.7,
-    capacity: 6,
-    image: "https://placehold.co/600x400?text=Cozumel+Blue",
-  },
-];
+interface BoatApi {
+  id?: string | number;
+  nombreEmbarcacion: string;
+  zonaCobertura: string;
+  promedioCalificaciones: number;
+  rating?: number;
+  capacidad: number;
+  fotosUrl?: string;
+}
+
+interface BoatOperatorApi {
+  nombre: string;
+  boats?: BoatApi[];
+}
 
 export default function BoatsPage() {
-  const [boats, setBoats] = useState<Boat[]>(MOCK_BOATS);
-  const [loading, setLoading] = useState(false);
+  const [boats, setBoats] = useState<Boat[]>([]);
+  const [allBoats, setAllBoats] = useState<Boat[]>([]);
+  const [loading, setLoading] = useState(true);
   const [hasSearched, setHasSearched] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+void BoatOperatorService
+      .getOperators()
+      .then((data: BoatOperatorApi[]) => {
+        if (cancelled) return;
+
+        setError(null);
+        const formattedBoats: Boat[] = [];
+
+        data.forEach((operator: BoatOperatorApi) => {
+          if (operator.boats && operator.boats.length > 0) {
+            operator.boats.forEach((boat: BoatApi) => {
+              formattedBoats.push({
+                id: boat.id ?? `${operator.nombre}-${boat.nombreEmbarcacion}`,
+                name: boat.nombreEmbarcacion,
+                captain: operator.nombre,
+                zone: boat.zonaCobertura,
+                rating: Number(boat.promedioCalificaciones) || 0.0,
+                capacity: boat.capacidad,
+                image:
+                  boat.fotosUrl ||
+                  "https://placehold.co/600x400?text=NautiFlow",
+              });
+            });
+          }
+        });
+
+        setBoats(formattedBoats);
+        setAllBoats(formattedBoats);
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+
+        console.error("Error al cargar las lanchas:", err);
+        setError("No se pudieron cargar las lanchas del servidor.");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleSearch = (filters: BoatSearchFilters) => {
-    setLoading(true);
     setHasSearched(true);
 
-    // Simulación local. Reemplazar por la llamada a la API.
-    const results = MOCK_BOATS.filter((boat) => {
+    const results = allBoats.filter((boat) => {
       const term = filters.search.toLocaleLowerCase();
 
       const matchesSearch =
         boat.name.toLocaleLowerCase().includes(term) ||
         boat.captain.toLocaleLowerCase().includes(term);
 
-      const matchesZone =
-        !filters.zone || boat.zone === filters.zone;
+      const matchesZone = !filters.zone || boat.zone === filters.zone;
 
       const matchesRating = boat.rating >= filters.rating;
 
@@ -70,12 +100,10 @@ export default function BoatsPage() {
     });
 
     setBoats(results);
-    setLoading(false);
   };
 
   return (
     <main className="min-h-screen ">
-
       <div className="-mt-2">
         <BoatSearch onSearch={handleSearch} loading={loading} />
       </div>
@@ -88,9 +116,19 @@ export default function BoatsPage() {
           {hasSearched ? "Resultados de búsqueda" : "Lanchas disponibles"}
         </h2>
 
-        {boats.length === 0 ? (
+        {error && (
+          <p className="mb-6 rounded-xl bg-error/10 p-4 text-center text-error">
+            {error}
+          </p>
+        )}
+
+        {loading ? (
+          <div className="py-12 text-center text-base-content/70">
+            Cargando lanchas...
+          </div>
+        ) : boats.length === 0 ? (
           <p className="rounded-xl bg-base-100 p-8 text-center text-base-content/70">
-            No encontramos lanchas con esos filtros.
+            No encontramos lancha registradas o con esos filtros.
           </p>
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -99,7 +137,7 @@ export default function BoatsPage() {
                 key={boat.id}
                 className="card overflow-hidden border border-base-300 bg-base-100 shadow-sm"
               >
-                <figure className="aspect-[3/2]">
+                <figure className="aspect-3/2">
                   <img
                     src={boat.image}
                     alt={boat.name}
@@ -110,9 +148,12 @@ export default function BoatsPage() {
                 <div className="card-body gap-2">
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="card-title">{boat.name}</h3>
-
                     <span className="badge badge-warning gap-1">
-                      <span aria-hidden="true">★</span>
+                      <Star
+                        size={14}
+                        aria-hidden="true"
+                        className="fill-current"
+                      />
                       {boat.rating}
                     </span>
                   </div>
@@ -121,15 +162,10 @@ export default function BoatsPage() {
                     {boat.zone} · {boat.captain}
                   </p>
 
-                  <p className="text-sm">
-                    Capacidad: {boat.capacity} personas
-                  </p>
+                  <p className="text-sm">Capacidad: {boat.capacity} personas</p>
 
                   <div className="card-actions mt-3">
-                    <button
-                      type="button"
-                      className="btn btn-primary w-full"
-                    >
+                    <button type="button" className="btn btn-primary w-full">
                       Ver detalles
                     </button>
                   </div>

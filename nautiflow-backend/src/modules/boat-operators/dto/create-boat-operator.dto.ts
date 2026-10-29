@@ -15,8 +15,12 @@ export class CreateBoatOperatorDto {
   @IsNotEmpty()
   nombre: string;
 
-  @ApiProperty({ example: '+573001234567' })
-  @IsPhoneNumber('CO')
+  @ApiProperty({
+    example: '+573001234567',
+    description:
+      'Número de teléfono internacional con código de país. Ejemplo: +573001234567',
+  })
+  @IsPhoneNumber()
   telefono: string;
 
   @ApiProperty({ example: 'https://ejemplo.com/licencia.pdf' })

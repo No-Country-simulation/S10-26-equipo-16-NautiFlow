@@ -11,7 +11,7 @@ export default function Navbar() {
 
       <div className="drawer-content flex flex-col">
         {/* Navbar */}
-        <div className="navbar fixed top-0 left-0 z-50 w-full bg-primary-content">
+        <div className="navbar fixed top-0 left-0 z-50 w-full bg-base-200">
           <div className="flex-none lg:hidden">
             <label
               htmlFor="my-drawer-2"

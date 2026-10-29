@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import type { FormEvent, ChangeEvent } from "react";
+import type { SubmitEvent, ChangeEvent } from "react";
+import { isAxiosError } from "axios";
 import { Link } from "react-router-dom";
 import {
   ArrowLeft,
@@ -16,15 +17,16 @@ import type {
   BoatFormData,
   UploadedFile,
   BoatDocument,
-  BoatRegistrationData,
   BoatRegistrationFormProps,
-  DocumentType,
-} from "./boatFormTypes";
-import { INITIAL_FORM, DOCUMENT_TYPES } from "./boatFormTypes";
+} from "./BoatFormTypes";
+import { INITIAL_FORM, DOCUMENT_TYPES } from "./BoatFormTypes";
 
 import Field from "./Field";
 import UploadZone from "./UploadZone";
 import ActionButton from "./ActionButton";
+import { BoatOperatorService } from "../../services/BoatOperator.Service";
+import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 
 export default function BoatRegistrationForm({
   onSubmit,
@@ -125,13 +127,11 @@ export default function BoatRegistrationForm({
     event.target.value = "";
   }
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
     //////////////
-    if (!validateStep()) {
-      return;
-    }
+    if (!validateStep()) return;
 
     if (step < 3) {
       setStep((previous) => previous + 1);
@@ -154,22 +154,47 @@ export default function BoatRegistrationForm({
     setLoading(true);
 
     try {
-      const data: BoatRegistrationData = {
+      const registrationPayload = {
         ...form,
         photos: photos.map((photo) => photo.file),
         documents,
       };
 
       if (onSubmit) {
-        await onSubmit(data);
+        await onSubmit(registrationPayload);
       } else {
-        // API conection pending.
-        console.info("Datos de registro de embarcación:", data);
+        const response =
+          await BoatOperatorService.registerOperatorAndBoat(
+            registrationPayload,
+          );
+        console.log("Registro guardado exitosamente en NestJS:", response);
       }
 
       setSent(true);
-    } catch {
-      setError("No fue posible enviar la solicitud. Intenta nuevamente.");
+    } catch (err: unknown) {
+      console.error("Error al registrar en NestJS:", err);
+
+      const responseData = isAxiosError<unknown>(err)
+        ? err.response?.data
+        : undefined;
+      const message =
+        typeof responseData === "object" &&
+        responseData !== null &&
+        "message" in responseData
+          ? responseData.message
+          : undefined;
+      const apiErrorMessage = Array.isArray(message)
+        ? message
+            .filter((item): item is string => typeof item === "string")
+            .join(", ")
+        : typeof message === "string"
+          ? message
+          : undefined;
+
+      setError(
+        apiErrorMessage ||
+          "No fue posible enviar la solicitud. Revisa los datos ingresados e intenta nuevamente.",
+      );
     } finally {
       setLoading(false);
     }
@@ -195,6 +220,7 @@ export default function BoatRegistrationForm({
 
     return true;
   }
+
   const formValidation = {
     captain: (value: string): string | null => {
       if (!value.trim()) {
@@ -210,15 +236,11 @@ export default function BoatRegistrationForm({
 
     phone: (value: string): string | null => {
       if (!value) {
-        return "El número de teléfono es obligatorio.";
+        return "El número de WhatsApp es obligatorio.";
       }
 
-      if (!/^\d+$/.test(value)) {
-        return "El teléfono solo debe contener números.";
-      }
-
-      if (value.length < 10 || value.length > 13) {
-        return "El teléfono debe tener entre 10 y 13 dígitos.";
+      if (!isValidPhoneNumber(value)) {
+        return "Ingresa un número de teléfono válido con su código de país.";
       }
 
       return null;
@@ -252,7 +274,7 @@ export default function BoatRegistrationForm({
   ];
 
   return (
-    <main className="min-h-screen bg-base-200/50 px-4 py-8 text-base-content sm:px-6 lg:py-12">
+    <main className="min-h-screen px-4 py-8 text-base-content sm:px-6 lg:py-12">
       <div className="mx-auto max-w-7xl">
         <Link
           to="/"
@@ -276,7 +298,7 @@ export default function BoatRegistrationForm({
           </p>
         </header>
 
-        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_300px]">
+        <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
           {/* Form */}
           <section className="min-w-0 rounded-2xl border border-base-300 bg-base-100 p-5 shadow-sm sm:p-8">
             {sent ? (
@@ -307,51 +329,54 @@ export default function BoatRegistrationForm({
             ) : (
               <>
                 {/* Step indicator */}
-                <div className="mb-9 flex items-start justify-between gap-2">
-                  {steps.map((item, index) => {
-                    const StepIcon = item.icon;
-                    const active = step === item.number;
-                    const completed = step > item.number;
+                <div className="mb-10 w-full">
+                  <ul className="steps steps-horizontal w-full">
+                    {steps.map((item) => {
+                      const active = step === item.number;
+                      const completed = step > item.number;
+                      const StepIcon = item.icon;
 
-                    return (
-                      <div
-                        key={item.number}
-                        className="relative flex flex-1 flex-col items-center gap-2 sm:flex-row sm:justify-center sm:gap-3"
-                      >
-                        {index > 0 && (
-                          <div
-                            className={`absolute right-1/2 top-5 -z-0 h-0.5 w-full ${
-                              step >= item.number ? "bg-primary" : "bg-base-300"
-                            }`}
-                          />
-                        )}
-
-                        <span
-                          className={`relative z-10 flex size-10 shrink-0 items-center justify-center rounded-full ${
-                            active || completed
-                              ? "bg-primary text-primary-content"
-                              : "border border-base-300 bg-base-200 text-base-content/50"
+                      return (
+                        <li
+                          key={item.number}
+                          className={`step ${
+                            active || completed ? "step-primary" : ""
                           }`}
                         >
-                          {completed ? (
-                            <Check size={17} />
-                          ) : (
-                            <StepIcon size={17} />
-                          )}
-                        </span>
+                          <div className="flex flex-col items-center gap-2">
+                            <div
+                              className={`flex h-10 w-10 items-center justify-center
+                              rounded-full border-2 transition-all duration-300 ${
+                                completed
+                                  ? "border-primary bg-primary text-primary-content"
+                                  : active
+                                    ? "border-primary bg-primary/10 text-primary ring-4 ring-primary/10"
+                                    : "border-base-300 bg-base-100 text-base-content/50"
+                              }`}
+                            >
+                              {completed ? (
+                                <Check size={20} />
+                              ) : (
+                                <StepIcon size={20} />
+                              )}
+                            </div>
 
-                        <span
-                          className={`relative z-10 text-center text-[11px] sm:text-xs ${
-                            active
-                              ? "font-bold text-primary"
-                              : "text-base-content/60"
-                          }`}
-                        >
-                          {item.label}
-                        </span>
-                      </div>
-                    );
-                  })}
+                            <span
+                              className={`text-center text-xs sm:text-sm ${
+                                active
+                                  ? "font-bold text-primary"
+                                  : completed
+                                    ? "font-medium"
+                                    : "text-base-content/60"
+                              }`}
+                            >
+                              {item.label}
+                            </span>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
                 </div>
 
                 <form onSubmit={handleSubmit}>
@@ -365,7 +390,7 @@ export default function BoatRegistrationForm({
 
                   {/* PASO 1 */}
                   {step === 1 && (
-                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                    <div className="flex flex-col gap-5">
                       <Field label="Nombre completo">
                         <input
                           className="input input-bordered w-full"
@@ -383,23 +408,14 @@ export default function BoatRegistrationForm({
                         label="Número de WhatsApp"
                         className="sm:col-span-2"
                       >
-                        <input
-                          className="input input-bordered w-full"
-                          type="tel"
-                          inputMode="numeric"
-                          autoComplete="tel"
-                          required
-                          minLength={10}
-                          maxLength={13}
-                          placeholder="9981234567"
-                          value={form.phone}
-                          onChange={(event) => {
-                            const digitsOnly = event.target.value
-                              .replace(/\D/g, "")
-                              .slice(0, 13);
-
-                            update("phone", digitsOnly);
-                          }}
+                        <PhoneInput
+                          international
+                          defaultCountry="MX"
+                          countryCallingCodeEditable={false}
+                          value={form.phone || undefined}
+                          onChange={(value) => update("phone", value ?? "")}
+                          placeholder="Ingresa tu número"
+                          className="input input-bordered flex items-center w-full gap-2 px-3 [&_input]:border-none [&_input]:outline-none [&_input]:bg-transparent [&_input]:w-full"
                         />
                       </Field>
                     </div>
@@ -600,9 +616,9 @@ export default function BoatRegistrationForm({
           </section>
 
           {/* Panel informativo */}
-          <aside className="rounded-2xl border border-base-300 bg-base-100 p-6">
+          <aside className="flex h-full flex-col rounded-2xl border border-base-300 bg-base-100 p-6">
             <div className="flex justify-center items-center">
-              <div className=" flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary mr-1">
+              <div className="flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary mr-1">
                 <BadgeCheck size={27} />
               </div>
 

@@ -25,7 +25,7 @@ export class BoatOperator {
   @Column({ type: 'varchar', length: 150, unique: true })
   telefono: string;
 
-  @Column({ type: 'varchar', length: 30 })
+  @Column({ type: 'varchar' })
   licenciaUrl: string;
 
   @Column({ type: 'varchar', nullable: true })
