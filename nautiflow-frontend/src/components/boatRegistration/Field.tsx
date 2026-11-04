@@ -1,4 +1,4 @@
-import type { FieldProps } from "./boatFormTypes";
+import type { FieldProps } from "./BoatFormTypes";
 
 export default function Field({ label, children, className = "" }: FieldProps) {
   return (

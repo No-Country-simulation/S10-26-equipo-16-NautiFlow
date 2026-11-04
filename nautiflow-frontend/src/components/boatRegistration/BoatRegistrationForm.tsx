@@ -18,9 +18,8 @@ import type {
   BoatDocument,
   BoatRegistrationData,
   BoatRegistrationFormProps,
-  DocumentType,
-} from "./boatFormTypes";
-import { INITIAL_FORM, DOCUMENT_TYPES } from "./boatFormTypes";
+} from "./BoatFormTypes";
+import { INITIAL_FORM, DOCUMENT_TYPES } from "./BoatFormTypes";
 
 import Field from "./Field";
 import UploadZone from "./UploadZone";
