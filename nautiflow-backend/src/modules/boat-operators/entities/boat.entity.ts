@@ -26,8 +26,14 @@ export class Boat {
   @Column({ type: 'varchar', nullable: true })
   seguroUrl: string; // URL del comprobante de seguro de la lancha
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  seguroPublicId: string | null;
+
   @Column({ type: 'text', nullable: true })
-  fotosUrl: string; // Puede ser una URL o un JSON con varias fotos de la lancha
+  fotosUrl: string;
+
+  @Column({ type: 'jsonb', nullable: true, default: () => "'[]'::jsonb" })
+  fotos: Array<{ url: string; publicId: string }>;
 
   @Column({ type: 'boolean', default: true })
   activa: boolean; // Para saber si está disponible en la flota general

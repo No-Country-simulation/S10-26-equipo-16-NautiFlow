@@ -1,7 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { BoatOperator, VerificationStatus } from '../boat-operators/entities/boat-operator.entity';
+import {
+  BoatOperator,
+  VerificationStatus,
+} from '../boat-operators/entities/boat-operator.entity';
 import { UpdateVerificationDto } from './dto/update-verification.dto';
 
 @Injectable()
@@ -29,7 +32,9 @@ export class AdminService {
     });
 
     if (!operator) {
-      throw new NotFoundException(`Operador de embarcación con ID ${id} no encontrado.`);
+      throw new NotFoundException(
+        `Operador de embarcación con ID ${id} no encontrado.`,
+      );
     }
 
     operator.estadoVerificacion = dto.estadoVerificacion;

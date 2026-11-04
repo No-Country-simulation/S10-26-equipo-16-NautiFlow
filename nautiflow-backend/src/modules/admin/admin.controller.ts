@@ -16,7 +16,9 @@ export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Consultar lanchas/operadores pendientes de verificación' })
+  @ApiOperation({
+    summary: 'Consultar lanchas/operadores pendientes de verificación',
+  })
   @ApiResponse({
     status: 200,
     description: 'Lista de operadores pendientes obtenida exitosamente.',
@@ -26,7 +28,9 @@ export class AdminController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Actualizar el estado de verificación de un operador' })
+  @ApiOperation({
+    summary: 'Actualizar el estado de verificación de un operador',
+  })
   @ApiParam({
     name: 'id',
     description: 'UUID del operador de embarcación',
@@ -37,7 +41,10 @@ export class AdminController {
     status: 200,
     description: 'Estado de verificación actualizado exitosamente.',
   })
-  @ApiResponse({ status: 400, description: 'Datos inválidos o estado incorrecto.' })
+  @ApiResponse({
+    status: 400,
+    description: 'Datos inválidos o estado incorrecto.',
+  })
   @ApiResponse({ status: 404, description: 'Operador no encontrado.' })
   updateVerification(
     @Param('id', ParseUUIDPipe) id: string,

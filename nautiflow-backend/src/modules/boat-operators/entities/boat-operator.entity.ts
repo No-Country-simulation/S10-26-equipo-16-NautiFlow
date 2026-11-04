@@ -25,11 +25,23 @@ export class BoatOperator {
   @Column({ type: 'varchar', length: 150, unique: true })
   telefono: string;
 
-  @Column({ type: 'varchar' })
-  licenciaUrl: string;
+  @Column({ type: 'text', nullable: true })
+  fotoPerfilUrl: string | null;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  fotoPerfilPublicId: string | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  licenciaUrl: string | null;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  licenciaPublicId: string | null;
 
   @Column({ type: 'varchar', nullable: true })
   antecedentesPenalesUrl: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  antecedentesPenalesPublicId: string | null;
 
   @Column({
     type: 'enum',

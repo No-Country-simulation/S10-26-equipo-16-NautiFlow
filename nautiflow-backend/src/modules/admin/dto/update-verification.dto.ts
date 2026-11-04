@@ -8,7 +8,10 @@ export class UpdateVerificationDto {
     enum: VerificationStatus,
     example: VerificationStatus.VERIFIED,
   })
-  @IsEnum(VerificationStatus, { message: 'El estado debe ser un valor válido de verificación (VERIFIED, REJECTED)' })
+  @IsEnum(VerificationStatus, {
+    message:
+      'El estado debe ser un valor válido de verificación (VERIFIED, REJECTED)',
+  })
   @IsNotEmpty()
   estadoVerificacion: VerificationStatus;
 }
