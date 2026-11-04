@@ -3,6 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Boat } from './entities/boat.entity';
 import { BoatOperator } from './entities/boat-operator.entity';
 import { BoatOperatorsService } from './boat-operators.service';
+import { StorageService } from '../storage/storage.service';
 
 describe('BoatOperatorsService', () => {
   let service: BoatOperatorsService;
@@ -13,6 +14,7 @@ describe('BoatOperatorsService', () => {
         BoatOperatorsService,
         { provide: getRepositoryToken(BoatOperator), useValue: {} },
         { provide: getRepositoryToken(Boat), useValue: {} },
+        { provide: StorageService, useValue: {} },
       ],
     }).compile();
 

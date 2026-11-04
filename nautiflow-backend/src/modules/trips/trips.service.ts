@@ -42,10 +42,10 @@ export class TripsService {
       }
     }
 
-    const trip = this.tripRepository.create({
-      ...createTripDto,
-      estado: createTripDto.boatId ? TripStatus.ASSIGNED : TripStatus.PENDING,
-    });
+    const trip = this.tripRepository.create(createTripDto);
+    trip.estado = createTripDto.boatId
+      ? TripStatus.ASSIGNED
+      : TripStatus.PENDING;
 
     return await this.tripRepository.save(trip);
   }

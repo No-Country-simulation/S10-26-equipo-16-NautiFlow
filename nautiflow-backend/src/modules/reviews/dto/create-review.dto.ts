@@ -23,7 +23,10 @@ export class CreateReviewDto {
   @IsNotEmpty()
   comment: string;
 
-  @ApiProperty({ description: 'Token de un solo uso entregado al turista', format: 'uuid' })
+  @ApiProperty({
+    description: 'Token de un solo uso entregado al turista',
+    format: 'uuid',
+  })
   @IsUUID()
   token: string;
 }

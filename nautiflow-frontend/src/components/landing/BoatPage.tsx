@@ -20,7 +20,9 @@ interface BoatApi {
   promedioCalificaciones: number;
   rating?: number;
   capacidad: number;
-  fotosUrl?: string;
+  fotos?: { url: string; publicId: string }[] | null;
+  fotosUrl?: string | null;
+  activa?: boolean;
 }
 
 interface BoatOperatorApi {
@@ -38,8 +40,7 @@ export default function BoatsPage() {
   useEffect(() => {
     let cancelled = false;
 
-void BoatOperatorService
-      .getOperators()
+    void BoatOperatorService.getOperators()
       .then((data: BoatOperatorApi[]) => {
         if (cancelled) return;
 
@@ -49,6 +50,8 @@ void BoatOperatorService
         data.forEach((operator: BoatOperatorApi) => {
           if (operator.boats && operator.boats.length > 0) {
             operator.boats.forEach((boat: BoatApi) => {
+              if (boat.activa === false) return;
+
               formattedBoats.push({
                 id: boat.id ?? `${operator.nombre}-${boat.nombreEmbarcacion}`,
                 name: boat.nombreEmbarcacion,
@@ -57,6 +60,7 @@ void BoatOperatorService
                 rating: Number(boat.promedioCalificaciones) || 0.0,
                 capacity: boat.capacidad,
                 image:
+                  boat.fotos?.find((photo) => photo.url)?.url ||
                   boat.fotosUrl ||
                   "https://placehold.co/600x400?text=NautiFlow",
               });

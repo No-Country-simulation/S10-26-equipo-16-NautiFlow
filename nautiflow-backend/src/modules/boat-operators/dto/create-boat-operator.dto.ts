@@ -5,6 +5,7 @@ import {
   IsOptional,
   IsString,
   IsPhoneNumber,
+  IsUrl,
 } from 'class-validator';
 
 import { VerificationStatus } from '../entities/boat-operator.entity';
@@ -23,15 +24,18 @@ export class CreateBoatOperatorDto {
   @IsPhoneNumber()
   telefono: string;
 
-  @ApiProperty({ example: 'https://ejemplo.com/licencia.pdf' })
-  @IsString()
-  @IsNotEmpty()
-  licenciaUrl: string;
+  @ApiPropertyOptional({
+    example: 'https://res.cloudinary.com/.../licencia.pdf',
+    description: 'Se asigna al cargar la licencia después de crear el operador.',
+  })
+  @IsUrl({ require_tld: false })
+  @IsOptional()
+  licenciaUrl?: string;
 
   @ApiPropertyOptional({
     example: 'https://ejemplo.com/antecedentes.pdf',
   })
-  @IsString()
+  @IsUrl({ require_tld: false })
   @IsOptional()
   antecedentesPenalesUrl?: string;
 

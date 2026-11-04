@@ -25,13 +25,13 @@ async function bootstrap() {
       'Documentación oficial del back-office de agencias de lanchas',
     )
     .setVersion('1.0')
-    .addTag('boat-operators')
-    .addTag('admin-verifications')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
 
-  SwaggerModule.setup('docs', app, document);
+  SwaggerModule.setup('docs', app, document, {
+    swaggerOptions: { operationsSorter: 'alpha', tagsSorter: 'alpha' },
+  });
 
   await app.listen(process.env.PORT ?? 3000);
 }
