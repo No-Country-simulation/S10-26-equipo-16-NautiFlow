@@ -5,12 +5,22 @@ import {
   Param,
   Body,
   ParseUUIDPipe,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { AdminService } from './admin.service';
 import { UpdateVerificationDto } from './dto/update-verification.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
-@ApiTags('admin-verifications')
+@ApiTags('Admin-verifications')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('admin/verifications')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
