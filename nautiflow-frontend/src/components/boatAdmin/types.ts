@@ -9,6 +9,9 @@ export type BoatTrip = {
   capacity?: number;
   status: "completed" | "scheduled" | "unassigned";
   rating: 1 | 2 | 3 | 4 | 5 | null;
+  reviewToken?: string;
+  reviewComment?: string;
+  reviewedAt?: string;
   // El backend debe persistir este estado y garantizar una única creación por viaje.
   reviewLinkGenerated: boolean;
 };

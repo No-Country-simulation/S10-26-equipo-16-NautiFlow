@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { SubmitEvent } from "react";
 import type { BoatRequest } from "./types";
+import { useTrips } from "../boatAdmin/useTrips";
 import { getTrips, saveTrip } from "../boatAdmin/tripStorage";
 import type { BoatTrip } from "../boatAdmin/types";
 
@@ -47,9 +48,7 @@ export default function CreateService({ boats }: { boats: BoatRequest[] }) {
   const [capacity, setCapacity] = useState("");
   const [emptyReturn, setEmptyReturn] = useState(false);
   const [boatId, setBoatId] = useState("");
-  const [trips, setTrips] = useState<BoatTrip[]>(() => {
-    try { return getTrips(); } catch { return []; }
-  });
+  const trips = useTrips();
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const ready = Boolean(date && time && Number(capacity) > 0);
@@ -61,7 +60,6 @@ export default function CreateService({ boats }: { boats: BoatRequest[] }) {
     setError("");
     try {
       const currentTrips = getTrips();
-      setTrips(currentTrips);
       const boat = boats.find((item) => item.id === selectedBoatId);
       if (!date || !time || !zone.trim() || !Number.isInteger(Number(capacity)) || Number(capacity) < 1 ||
           (boatId !== "" && (!boat || !isAvailable(boat, currentTrips, date, time, Number(capacity))))) {
@@ -73,7 +71,6 @@ export default function CreateService({ boats }: { boats: BoatRequest[] }) {
         status: boat ? "scheduled" : "unassigned", rating: null, reviewLinkGenerated: false,
       };
       saveTrip(trip);
-      setTrips([...currentTrips, trip]);
       const formattedDate = new Intl.DateTimeFormat("es-MX", { timeZone: "UTC" }).format(new Date(`${date}T00:00:00Z`));
       setMessage(`${boat ? "Asignado" : "Guardado sin asignar"} viaje a zona ${trip.zone} con fecha ${formattedDate} a las ${time}`);
       setBoatId("");
