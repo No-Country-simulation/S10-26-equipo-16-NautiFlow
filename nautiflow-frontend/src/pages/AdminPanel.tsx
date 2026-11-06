@@ -12,7 +12,6 @@ import type {
   BoatRequest,
   VerificationStatus,
 } from "../components/adminPanel/types";
-import { screenSize } from "../hooks/screenSize";
 
 // Datos temporales
 
@@ -30,7 +29,6 @@ export default function AdminPanel() {
   const [filters, setFilters] =
     useState<BoatRequestFiltersState>(INITIAL_FILTERS);
   const [requests, setRequests] = useState<BoatRequest[]>(getBoats);
-  const {isMobile, isTablet} = screenSize()
 
   // Actualizar status
   async function handleStatusChange(id: string, status: VerificationStatus) {
@@ -64,8 +62,8 @@ export default function AdminPanel() {
   }
   return (
     <PageContainer>
-      <div className={`${(!isMobile && !isTablet) ? "flex flex-row" : " "}`}>
-        <div className="xl:pr-[22rem] pr-1">
+      <div className="w-full min-w-0 lg:pr-80">
+        <div className="min-w-0 lg:pr-6">
           <h1 className="py-2">Administración </h1>
           {emptyReturnMessage && (
             <div role="status" className="mb-5 rounded-xl bg-base-100 p-4">
@@ -96,10 +94,10 @@ export default function AdminPanel() {
         </div>
 
         {/* ----------------- empty return ----------- */}
-        <div className="mb-6 xl:fixed xl:top-20 xl:right-4 xl:z-30 xl:w-80 p-3 bg-tertiary rounded-xl mt-2">
+        <div className="mt-6 flex min-h-0 flex-col gap-3 rounded-xl bg-tertiary p-3 lg:fixed lg:inset-y-0 lg:top-16 lg:right-0 lg:z-30 lg:mt-0 lg:w-80 lg:rounded-none lg:border-l lg:border-base-300 lg:shadow-lg">
           <button
             type="button"
-            className="btn btn-primary rounded-full mb-3 w-full"
+            className="btn btn-primary w-full shrink-0 rounded-full"
             aria-haspopup="dialog"
             onClick={() => setIsEmptyReturnOpen(true)}
           >
