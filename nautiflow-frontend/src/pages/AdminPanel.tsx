@@ -4,6 +4,7 @@ import type { BoatRequestFiltersState } from "../components/adminPanel/types";
 import { useState } from "react";
 import VerificationCard from "../components/adminPanel/VerificationCard";
 import EmptyReturnModal from "../components/adminPanel/EmptyReturnModal";
+import DocumentsModal from "../components/adminPanel/DocumentsModal";
 import { getBoats } from "../components/boatAdmin/boatCatalog";
 import { Link } from "react-router-dom";
 import EmptyReturnColumn from "../components/adminPanel/EmptyReturnColumn";
@@ -25,6 +26,8 @@ const INITIAL_FILTERS: BoatRequestFiltersState = {
 
 export default function AdminPanel() {
   const [isEmptyReturnOpen, setIsEmptyReturnOpen] = useState(false);
+  const [selectedBoatForDocuments, setSelectedBoatForDocuments] =
+    useState<BoatRequest | null>(null);
   const [emptyReturnMessage, setEmptyReturnMessage] = useState("");
   const [filters, setFilters] =
     useState<BoatRequestFiltersState>(INITIAL_FILTERS);
@@ -50,9 +53,7 @@ export default function AdminPanel() {
   }
 
   function handleViewDocuments(boat: BoatRequest) {
-    console.log("Ver documentos:", boat.id);
-
-    // Aquí puedes abrir un modal de documentos.
+    setSelectedBoatForDocuments(boat);
   }
 
   function handleAssignTrip(boat: BoatRequest) {
@@ -112,6 +113,12 @@ export default function AdminPanel() {
               setEmptyReturnMessage(message);
               setIsEmptyReturnOpen(false);
             }}
+          />
+        )}
+        {selectedBoatForDocuments && (
+          <DocumentsModal
+            boat={selectedBoatForDocuments}
+            onClose={() => setSelectedBoatForDocuments(null)}
           />
         )}
       </div>

@@ -10,6 +10,7 @@ import { EmptyLegsModule } from './modules/empty-legs/empty-legs.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { StorageModule } from './modules/storage/storage.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { StorageModule } from './modules/storage/storage.module';
       inject: [ConfigService],
       useFactory: getDatabaseConfig,
     }),
+    AuthModule,
     BoatOperatorsModule,
     TripsModule,
     EmptyLegsModule,
