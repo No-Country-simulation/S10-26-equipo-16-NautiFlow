@@ -1,14 +1,14 @@
 import {  useSearchParams } from "react-router-dom";
 import PageContainer from "../components/PageContainer";
 import BoatHistoryRow from "../components/boatAdmin/BoatHistoryRow";
-import { getTrips } from "../components/boatAdmin/tripStorage";
+import { useTrips } from "../components/boatAdmin/useTrips";
 import BackToAdminBtn from "../components/adminPanel/BackToAdminBtn";
 
 export default function BoatHistory() {
   const [searchParams] = useSearchParams();
   const boatId = searchParams.get("boatId");
   const boatName = searchParams.get("boatName") || boatId;
-  const trips = getTrips().filter((trip) => trip.boatId === boatId);
+  const trips = useTrips().filter((trip) => trip.boatId === boatId);
   const completed = trips.filter((trip) => trip.status === "completed")
     .sort((a, b) => `${b.date}T${b.time}`.localeCompare(`${a.date}T${a.time}`));
   const scheduled = trips.filter((trip) => trip.status === "scheduled")
@@ -22,7 +22,7 @@ export default function BoatHistory() {
         <p>Selecciona una embarcación desde el panel de administración para consultar sus viajes.</p>
       ) : (
         <>
-          <p className="mb-6 text-sm text-base-content/60">Datos de ejemplo y viajes guardados en este navegador. La consulta real y la generación única de enlaces de reseña están pendientes de integración.</p>
+          <p className="mb-6 text-sm text-base-content/60">Datos de ejemplo y viajes guardados en este navegador. Los enlaces de reseña funcionan en este navegador; compartirlos entre dispositivos requiere integración con el servidor.</p>
           <section aria-labelledby="completed-trips" className="mb-8">
             <h2 id="completed-trips" className="mb-4 text-xl">Historial de viajes</h2>
             <div className="space-y-3">

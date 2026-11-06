@@ -2,6 +2,8 @@ import { Star } from "lucide-react";
 import type { BoatTrip } from "./types";
 import { useState } from "react";
 import { getBoats } from "./boatCatalog";
+import { useTrips } from "./useTrips";
+import { generateReviewLink } from "../../services/Review.Service";
 import AssignBoatModal from "../allServices/AssignBoatModal";
 
 const STATUS_CONFIG = {
@@ -10,7 +12,22 @@ const STATUS_CONFIG = {
   completed: { label: "Finalizado", className: "border-green-300 bg-green-100 text-green-700" },
 };
 
-export default function BoatHistoryRow({ trip, onAssigned }: { trip: BoatTrip; onAssigned?: () => void }) {
+export default function BoatHistoryRow({ trip: initialTrip, onAssigned }: { trip: BoatTrip; onAssigned?: () => void }) {
+  const trips = useTrips();
+  const trip = trips.find((item) => item.id === initialTrip.id) ?? initialTrip;
+  const [linkStatus, setLinkStatus] = useState("");
+  const reviewLink = trip.reviewToken ? `${window.location.origin}/review-trip/${encodeURIComponent(trip.reviewToken)}` : "";
+
+  async function copyReviewLink() {
+    try {
+      const link = generateReviewLink(trip.id);
+      await navigator.clipboard.writeText(link);
+      setLinkStatus("Enlace copiado al portapapeles.");
+    } catch (error) {
+      setLinkStatus(error instanceof Error ? error.message : "No se pudo copiar. Puedes copiar el enlace manualmente.");
+    }
+  }
+
   const [assignOpen, setAssignOpen] = useState(false);
   const status = STATUS_CONFIG[trip.status];
   const boatName = trip.boatName || getBoats().find((boat) => boat.id === trip.boatId)?.name;
@@ -21,7 +38,7 @@ export default function BoatHistoryRow({ trip, onAssigned }: { trip: BoatTrip; o
   return (
     <article className="flex flex-col gap-4 rounded-xl border border-base-300 bg-base-100 p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-lg">{boatName || (trip.boatId ? `Embarcación ${trip.boatId}` : "Embarcación sin asignar")}</h3>
+        <h3 className="text-lg">{boatName || (trip.boatId ? `Embarcación ${trip.boatId}` : "Sin asignar")}</h3>
         <span className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${status.className}`}>{status.label}</span>
       </div>
       {trip.emptyReturn && <span className="badge badge-outline">Regreso vacío</span>}
@@ -44,12 +61,15 @@ export default function BoatHistoryRow({ trip, onAssigned }: { trip: BoatTrip; o
       {assignOpen && (
         <AssignBoatModal trip={trip} onClose={() => setAssignOpen(false)} onAssigned={() => { setAssignOpen(false); onAssigned?.(); }} />
       )}
-      {!trip.reviewLinkGenerated && (
-        <div className="shrink-0">
-          <button type="button" className="btn btn-outline btn-sm w-full" disabled aria-describedby={`review-pending-${trip.id}`}>
-            Generar link de reseña
+      {trip.status === "completed" && trip.rating === null && (
+        <div className="space-y-2">
+          <button type="button" className="btn btn-outline btn-sm w-full" onClick={copyReviewLink}>
+            {trip.reviewToken ? "Copiar link de reseña" : "Generar link de reseña"}
           </button>
-          <p id={`review-pending-${trip.id}`} className="mt-1 text-xs text-base-content/60">Disponible próximamente</p>
+          {reviewLink && <label className="block text-sm">Enlace de reseña
+            <input className="input mt-1 w-full" readOnly value={reviewLink} onFocus={(event) => event.target.select()} />
+          </label>}
+          <p role="status" className="text-sm">{linkStatus}</p>
         </div>
       )}
     </article>
