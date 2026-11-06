@@ -122,3 +122,15 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+# Configuración del administrador
+
+El login temporal fue reemplazado por un único administrador configurado en el entorno. Antes de iniciar el backend:
+
+1. Copia `.env.template` a `.env` si aún no tienes este archivo.
+2. Genera `JWT_SECRET` con `node -e "console.log(require('node:crypto').randomBytes(32).toString('base64'))"`.
+3. Genera el hash ejecutando `node scripts/generate-admin-password-hash.cjs` desde `nautiflow-backend`; escribe la contraseña en la terminal (no se mostrará) y copia el valor resultante a `ADMIN_PASSWORD_HASH` en `.env`. Configura también `ADMIN_EMAIL`.
+
+No compartas ni subas el `.env` al repositorio. El backend no inicia si falta alguna de estas variables.
+
+El endpoint `POST /api/v1/auth/login` recibe `{ "email": "...", "password": "..." }`. Usa el `access_token` devuelto como Bearer token. Las rutas de administración requieren JWT válido y rol `admin`.
