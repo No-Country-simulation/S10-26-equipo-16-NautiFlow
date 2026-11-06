@@ -8,6 +8,8 @@ import DocumentsModal from "../components/adminPanel/DocumentsModal";
 import { getBoats } from "../components/boatAdmin/boatCatalog";
 import { Link, useNavigate } from "react-router-dom";
 import { clearAuthToken } from "../services/auth";
+import { Link } from "react-router-dom";
+import EmptyReturnColumn from "../components/adminPanel/EmptyReturnColumn";
 import CreateService from "../components/adminPanel/CreateService";
 import type {
   BoatRequest,
@@ -127,6 +129,69 @@ export default function AdminPanel() {
             />
           ))}
         </div>
+
+    // Aquí puedes abrir el formulario de asignación.
+  }
+  return (
+    <PageContainer>
+      <div className="w-full min-w-0 lg:pr-80">
+        <div className="min-w-0 lg:pr-6">
+          <h1 className="py-2">Administración </h1>
+          {emptyReturnMessage && (
+            <div role="status" className="mb-5 rounded-xl bg-base-100 p-4">
+              <p className="font-medium">Aviso preparado localmente:</p>
+              <p className="break-words">{emptyReturnMessage}</p>
+            </div>
+          )}
+
+          <Link
+            to="/all-services"
+            className="btn btn-outline mb-4 rounded-full"
+          >
+            Todos los servicios
+          </Link>
+          <CreateService boats={requests} />
+          <BoatRequestFilters filters={filters} onChange={setFilters} />
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+            {requests.map((boat) => (
+              <VerificationCard
+                key={boat.id}
+                boat={boat}
+                onStatusChange={handleStatusChange}
+                onViewDocuments={handleViewDocuments}
+                onAssignTrip={handleAssignTrip}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* ----------------- empty return ----------- */}
+        <div className="mt-6 flex min-h-0 flex-col gap-3 rounded-xl bg-tertiary p-3 lg:fixed lg:inset-y-0 lg:top-16 lg:right-0 lg:z-30 lg:mt-0 lg:w-80 lg:rounded-none lg:border-l lg:border-base-300 lg:shadow-lg">
+          <button
+            type="button"
+            className="btn btn-primary w-full shrink-0 rounded-full"
+            aria-haspopup="dialog"
+            onClick={() => setIsEmptyReturnOpen(true)}
+          >
+            Anunciar regreso vacío
+          </button>
+          <EmptyReturnColumn />
+        </div>
+        {isEmptyReturnOpen && (
+          <EmptyReturnModal
+            onClose={() => setIsEmptyReturnOpen(false)}
+            onSend={(message) => {
+              setEmptyReturnMessage(message);
+              setIsEmptyReturnOpen(false);
+            }}
+          />
+        )}
+        {selectedBoatForDocuments && (
+          <DocumentsModal
+            boat={selectedBoatForDocuments}
+            onClose={() => setSelectedBoatForDocuments(null)}
+          />
+        )}
       </div>
     </PageContainer>
   );
