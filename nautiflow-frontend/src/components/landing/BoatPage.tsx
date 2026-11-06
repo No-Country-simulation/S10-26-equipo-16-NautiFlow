@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import BoatSearch, { type BoatSearchFilters } from "./BoatSearch";
 import { Star } from "lucide-react";
 import { BoatOperatorService } from "../../services/BoatOperator.Service";
+import { DELTA_ZONES } from "../../constants/deltaZones";
 
 interface Boat {
   id: string | number;
   name: string;
   captain: string;
-  zone: string;
+  zone: string[];
   rating: number;
   capacity: number;
   image: string;
@@ -16,7 +17,7 @@ interface Boat {
 interface BoatApi {
   id?: string | number;
   nombreEmbarcacion: string;
-  zonaCobertura: string;
+  zonaCobertura: string[] | string;
   promedioCalificaciones: number;
   rating?: number;
   capacidad: number;
@@ -27,7 +28,14 @@ interface BoatApi {
 
 interface BoatOperatorApi {
   nombre: string;
+  estadoVerificacion: string;
   boats?: BoatApi[];
+}
+
+function normalizeZones(value: string[] | string): string[] {
+  return Array.isArray(value)
+    ? value
+    : value.split(",").map((zone) => zone.trim()).filter(Boolean);
 }
 
 export default function BoatsPage() {
@@ -48,6 +56,7 @@ export default function BoatsPage() {
         const formattedBoats: Boat[] = [];
 
         data.forEach((operator: BoatOperatorApi) => {
+          if (operator.estadoVerificacion !== "VERIFIED") return;
           if (operator.boats && operator.boats.length > 0) {
             operator.boats.forEach((boat: BoatApi) => {
               if (boat.activa === false) return;
@@ -56,7 +65,7 @@ export default function BoatsPage() {
                 id: boat.id ?? `${operator.nombre}-${boat.nombreEmbarcacion}`,
                 name: boat.nombreEmbarcacion,
                 captain: operator.nombre,
-                zone: boat.zonaCobertura,
+                zone: normalizeZones(boat.zonaCobertura),
                 rating: Number(boat.promedioCalificaciones) || 0.0,
                 capacity: boat.capacidad,
                 image:
@@ -96,7 +105,7 @@ export default function BoatsPage() {
         boat.name.toLocaleLowerCase().includes(term) ||
         boat.captain.toLocaleLowerCase().includes(term);
 
-      const matchesZone = !filters.zone || boat.zone === filters.zone;
+      const matchesZone = !filters.zone || boat.zone.includes(filters.zone);
 
       const matchesRating = boat.rating >= filters.rating;
 
@@ -109,7 +118,7 @@ export default function BoatsPage() {
   return (
     <main className="min-h-screen ">
       <div className="-mt-2">
-        <BoatSearch onSearch={handleSearch} loading={loading} />
+      <BoatSearch onSearch={handleSearch} loading={loading} zones={[...DELTA_ZONES]} />
       </div>
 
       <section
@@ -163,7 +172,7 @@ export default function BoatsPage() {
                   </div>
 
                   <p className="text-sm text-base-content/70">
-                    {boat.zone} · {boat.captain}
+                    {boat.zone.join(", ")} · {boat.captain}
                   </p>
 
                   <p className="text-sm">Capacidad: {boat.capacity} personas</p>

@@ -8,8 +8,10 @@ import {
   IsUUID,
   IsOptional,
   IsEnum,
+  IsIn,
 } from 'class-validator';
 import { TripStatus } from '../entities/trip.entity';
+import { DELTA_ZONES } from '../../zones/delta-zones';
 
 export class CreateTripDto {
   @ApiProperty({
@@ -27,6 +29,15 @@ export class CreateTripDto {
   @IsString()
   @IsNotEmpty()
   destino: string;
+
+  @ApiProperty({
+    description: 'Sector de cobertura solicitado para el viaje',
+    enum: DELTA_ZONES,
+    example: DELTA_ZONES[0],
+  })
+  @IsIn(DELTA_ZONES)
+  @IsNotEmpty()
+  zona: string;
 
   @ApiProperty({
     description: 'Fecha y hora programadas para la salida en formato ISO 8601',

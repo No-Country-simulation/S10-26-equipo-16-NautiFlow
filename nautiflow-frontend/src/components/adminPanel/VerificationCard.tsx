@@ -1,4 +1,3 @@
-
 import {
   BadgeCheck,
   Clock,
@@ -14,27 +13,24 @@ import {
 } from "lucide-react";
 
 import type { VerificationCardProps, VerificationStatus } from "./types";
+import WhatsAppContact from "./WhatsAppContact";
 import { Link } from "react-router-dom";
-
 
 const STATUS_CONFIG = {
   pending: {
     label: "Pendiente",
     icon: Clock,
-    className:
-      "border-yellow-300 bg-yellow-100 text-yellow-700",
+    className: "border-yellow-300 bg-yellow-100 text-yellow-700",
   },
   verified: {
     label: "Verificado",
     icon: BadgeCheck,
-    className:
-      "border-green-300 bg-green-100 text-green-700",
+    className: "border-green-300 bg-green-100 text-green-700",
   },
   rejected: {
     label: "Rechazado",
     icon: XCircle,
-    className:
-      "border-red-300 bg-red-100 text-red-700",
+    className: "border-red-300 bg-red-100 text-red-700",
   },
 } satisfies Record<
   VerificationStatus,
@@ -47,6 +43,7 @@ const STATUS_CONFIG = {
 
 export default function VerificationCard({
   boat,
+  isUpdating = false,
   onStatusChange,
   onViewDocuments,
   onAssignTrip,
@@ -57,8 +54,6 @@ export default function VerificationCard({
   return (
     <article className="card w-full border border-base-300 bg-base-100 shadow-sm transition hover:shadow-md">
       <div className="card-body gap-4">
-
-     
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
             <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -66,17 +61,12 @@ export default function VerificationCard({
             </div>
 
             <div className="min-w-0">
-              <h2 className="card-title truncate text-lg">
-                {boat.name}
-              </h2>
+              <h2 className="card-title truncate text-lg">{boat.name}</h2>
 
-              <p className="text-sm text-base-content/60">
-                {boat.captain}
-              </p>
+              <p className="text-sm text-base-content/60">{boat.captain}</p>
             </div>
           </div>
 
-       
           <span
             className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold ${status.className}`}
           >
@@ -86,7 +76,6 @@ export default function VerificationCard({
         </div>
 
         <div className="space-y-3 text-sm">
-
           <div className="flex items-center gap-2 text-base-content/70">
             <Phone size={16} className="shrink-0" />
             <span>{boat.phone}</span>
@@ -95,7 +84,7 @@ export default function VerificationCard({
           <div className="flex flex-wrap gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-lg bg-base-200 px-3 py-2 text-xs">
               <MapPin size={14} />
-              {boat.zone}
+              {boat.zone.join(", ") || "Sin zonas registradas"}
             </span>
 
             <span className="inline-flex items-center gap-1.5 rounded-lg bg-base-200 px-3 py-2 text-xs">
@@ -104,6 +93,12 @@ export default function VerificationCard({
             </span>
           </div>
         </div>
+
+        <WhatsAppContact
+          phone={boat.phone}
+          boatName={boat.name}
+          className="w-full"
+        />
 
         <div className="border-t border-base-300" />
 
@@ -130,9 +125,8 @@ export default function VerificationCard({
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
-                onClick={() =>
-                  onStatusChange(boat.id, "rejected")
-                }
+                disabled={isUpdating}
+                onClick={() => onStatusChange(boat.id, "rejected")}
                 className="btn btn-outline btn-error btn-sm"
               >
                 <X size={16} />
@@ -141,9 +135,8 @@ export default function VerificationCard({
 
               <button
                 type="button"
-                onClick={() =>
-                  onStatusChange(boat.id, "verified")
-                }
+                disabled={isUpdating}
+                onClick={() => onStatusChange(boat.id, "verified")}
                 className="btn btn-success btn-sm"
               >
                 <Check size={16} />

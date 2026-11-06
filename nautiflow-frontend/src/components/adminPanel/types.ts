@@ -4,6 +4,7 @@ export type BoatRequestFiltersState = {
   time: string;
   capacity: string;
   zone: string;
+  verification: "all" | VerificationStatus;
 };
 
 export type BoatRequestFiltersProps = {
@@ -15,11 +16,13 @@ export type VerificationStatus = "pending" | "verified" | "rejected";
 
 export type BoatRequest = {
   id: string;
+  verificationId?: string;
   name: string;
   captain: string;
   phone: string;
-  zone: string;
+  zone: string[];
   capacity: number;
+  active?: boolean;
   status: VerificationStatus;
   documents?: BoatDocument[];
 };
@@ -31,6 +34,7 @@ export type BoatDocument = {
 
 export type VerificationCardProps = {
   boat: BoatRequest;
+  isUpdating?: boolean;
   onStatusChange: (
     id: string,
     status: VerificationStatus,

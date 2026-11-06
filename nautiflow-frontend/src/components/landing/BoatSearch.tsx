@@ -1,5 +1,6 @@
 import { useState, type SubmitEvent } from "react";
 import { MapPin, Search, Star, X } from "lucide-react";
+import { DELTA_ZONES } from "../../constants/deltaZones";
 
 export interface BoatSearchFilters {
   search: string;
@@ -13,11 +14,9 @@ interface BoatSearchProps {
   loading?: boolean;
 }
 
-const DEFAULT_ZONES = ["Cancún", "Isla Mujeres", "Cozumel"];
-
 export default function BoatSearch({
   onSearch,
-  zones = DEFAULT_ZONES,
+  zones = [...DELTA_ZONES],
   loading = false,
 }: BoatSearchProps) {
   const [search, setSearch] = useState("");
