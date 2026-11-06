@@ -17,10 +17,11 @@ import {
 import { AdminService } from './admin.service';
 import { UpdateVerificationDto } from './dto/update-verification.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { AdminRoleGuard } from '../auth/guards/admin-role.guard';
 
 @ApiTags('Admin-verifications')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, AdminRoleGuard)
 @Controller('admin/verifications')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}

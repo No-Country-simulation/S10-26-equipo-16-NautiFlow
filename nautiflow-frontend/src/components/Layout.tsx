@@ -1,6 +1,7 @@
-import { Routes, Route } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import Home from "../pages/Home";
-import AdminPanel from "../pages/AdminPanel";
+import AdminLogin from "../pages/AdminLogin";
+import ProtectedAdminRoute from "./ProtectedAdminRoute";
 import NotFound from "./NotFound";
 import BoatRegister from "../pages/BoatRegister";
 import AllServices from "../pages/AllServices";
@@ -11,7 +12,8 @@ export default function Layout() {
     <main>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/admin-panel" element={<AdminPanel/>} />
+        <Route path="/admin-login" element={<AdminLogin />} />
+        <Route path="/admin-panel" element={<ProtectedAdminRoute />} />
         <Route path="/all-services" element={<AllServices />} />
         <Route path="/boat-history" element={<BoatHistory />} />
         <Route path="/boat-register" element={<BoatRegister/>}/>
