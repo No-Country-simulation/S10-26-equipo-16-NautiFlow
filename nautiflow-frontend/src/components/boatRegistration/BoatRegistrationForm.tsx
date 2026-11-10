@@ -25,6 +25,7 @@ import Field from "./Field";
 import UploadZone from "./UploadZone";
 import ActionButton from "./ActionButton";
 import { BoatOperatorService } from "../../services/BoatOperator.Service";
+import { DELTA_ZONES } from "../../constants/deltaZones";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 
@@ -216,6 +217,11 @@ export default function BoatRegistrationForm({
         setError(captainError ?? phoneError ?? "");
         return false;
       }
+    }
+
+    if (step === 2 && form.zone.length === 0) {
+      setError("Selecciona al menos una zona de cobertura.");
+      return false;
     }
 
     return true;
@@ -410,7 +416,7 @@ export default function BoatRegistrationForm({
                       >
                         <PhoneInput
                           international
-                          defaultCountry="MX"
+                          defaultCountry="AR"
                           countryCallingCodeEditable={false}
                           value={form.phone || undefined}
                           onChange={(value) => update("phone", value ?? "")}
@@ -453,21 +459,38 @@ export default function BoatRegistrationForm({
                       </Field>
 
                       <Field
-                        label="Zona de cobertura"
+                        label="Zonas de cobertura"
                         className="sm:col-span-2"
                       >
-                        <select
-                          className="select select-bordered w-full"
-                          required
-                          value={form.zone}
-                          onChange={(event) =>
-                            update("zone", event.target.value)
-                          }
-                        >
-                          <option value="Cancún">Cancún</option>
-                          <option value="Isla Mujeres">Isla Mujeres</option>
-                          <option value="Cozumel">Cozumel</option>
-                        </select>
+                        <fieldset className="space-y-3">
+                          <legend className="mb-2 text-sm text-base-content/70">
+                            Selecciona todos los sectores del Delta donde opera
+                            la lancha.
+                          </legend>
+                          <div className="grid gap-2 sm:grid-cols-2">
+                            {DELTA_ZONES.map((zone) => (
+                              <label
+                                key={zone}
+                                className="flex cursor-pointer items-center gap-3 rounded-xl border border-base-300 p-3"
+                              >
+                                <input
+                                  type="checkbox"
+                                  className="checkbox checkbox-primary"
+                                  checked={form.zone.includes(zone)}
+                                  onChange={(event) => {
+                                    const selected = event.target.checked
+                                      ? [...form.zone, zone]
+                                      : form.zone.filter(
+                                          (item) => item !== zone,
+                                        );
+                                    update("zone", selected);
+                                  }}
+                                />
+                                <span>{zone}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </fieldset>
                       </Field>
                     </div>
                   )}

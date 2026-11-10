@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, IsString, IsUUID, Max, Min } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsInt, IsNotEmpty, IsOptional, IsString, IsUUID, Max, Min } from 'class-validator';
 
 export class CreateReviewDto {
   @ApiProperty({
@@ -14,14 +14,15 @@ export class CreateReviewDto {
   @Max(5)
   rating: number;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Comentario del turista sobre su experiencia',
     example: 'Excelente servicio, puntualidad y buena atención.',
     type: String,
   })
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
-  comment: string;
+  comment?: string;
 
   @ApiProperty({
     description: 'Token de un solo uso entregado al turista',

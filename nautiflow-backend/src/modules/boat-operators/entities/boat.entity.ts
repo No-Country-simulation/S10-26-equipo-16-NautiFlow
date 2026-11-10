@@ -20,8 +20,8 @@ export class Boat {
   @Column({ type: 'int' })
   capacidad: number; // Ej: 5 pasajeros (clave para el buscador del admin)
 
-  @Column({ type: 'varchar', length: 100 })
-  zonaCobertura: string; // Ej: "Primera Sección", "Tigre Centro", etc.
+  @Column('simple-array')
+  zonaCobertura: string[];
 
   @Column({ type: 'varchar', nullable: true })
   seguroUrl: string; // URL del comprobante de seguro de la lancha

@@ -1,35 +1,79 @@
 import { useEffect, useRef, useState } from "react";
-import type { SubmitEvent } from "react";
+import type { FormEvent } from "react";
+import {
+  createEmptyLeg,
+  getAvailableBoats,
+} from "../../services/EmptyLegs.Service";
+import type { AvailableBoat } from "../../services/EmptyLegs.Service";
 
 type EmptyReturnModalProps = {
   onClose: () => void;
-  onSend: (message: string) => void;
+  onCreated: () => void;
 };
 
-export default function EmptyReturnModal({ onClose, onSend }: EmptyReturnModalProps) {
+export default function EmptyReturnModal({
+  onClose,
+  onCreated,
+}: EmptyReturnModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const [boat, setBoat] = useState("");
-  const [zone, setZone] = useState("");
+  const [boats, setBoats] = useState<AvailableBoat[]>([]);
+  const [boatId, setBoatId] = useState("");
+  const [origin, setOrigin] = useState("");
+  const [destination, setDestination] = useState("");
+  const [date, setDate] = useState("");
   const [time, setTime] = useState("");
-  const message = `Lancha ${boat.trim() || "X"} vuelve vacía desde la Zona ${zone.trim() || "Y"} a las ${time || "15:00"}hs. ¿Alguien necesita un rescate o envío en ese trayecto?`;
+  const [isLoadingBoats, setIsLoadingBoats] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const dialog = dialogRef.current;
     dialog?.showModal();
-    return () => dialog?.close();
+    let active = true;
+    getAvailableBoats()
+      .then((loadedBoats) => {
+        if (active) setBoats(loadedBoats);
+      })
+      .catch(() => {
+        if (active) setError("No se pudieron cargar las lanchas verificadas.");
+      })
+      .finally(() => {
+        if (active) setIsLoadingBoats(false);
+      });
+    return () => {
+      active = false;
+      dialog?.close();
+    };
   }, []);
 
-  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    onSend(message);
+    setError("");
+    setIsSaving(true);
+    try {
+      await createEmptyLeg({
+        boatId,
+        origin: origin.trim(),
+        destination: destination.trim(),
+        departure: new Date(`${date}T${time}:00`).toISOString(),
+      });
+      onCreated();
+    } catch {
+      setError(
+        "No se pudo anunciar el retorno. Verifica que la fecha y hora sean futuras e intenta de nuevo.",
+      );
+    } finally {
+      setIsSaving(false);
+    }
   }
+
+  const selectedBoat = boats.find((boat) => boat.id === boatId);
 
   return (
     <dialog
       ref={dialogRef}
       className="modal"
       aria-labelledby="empty-return-title"
-      aria-describedby="empty-return-preview"
       onCancel={(event) => {
         event.preventDefault();
         onClose();
@@ -41,48 +85,113 @@ export default function EmptyReturnModal({ onClose, onSend }: EmptyReturnModalPr
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <label className="block">
-            <span className="mb-1 block text-sm font-medium">Lancha</span>
+            <span className="mb-1 block text-sm font-medium">
+              Lancha verificada
+            </span>
+            <select
+              className="select w-full"
+              required
+              value={boatId}
+              onChange={(event) => setBoatId(event.target.value)}
+              disabled={isLoadingBoats || isSaving}
+            >
+              <option value="">Selecciona una lancha</option>
+              {boats.map((boat) => (
+                <option key={boat.id} value={boat.id}>
+                  {boat.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="block">
+            <span className="mb-1 block text-sm font-medium">
+              Zona de origen
+            </span>
             <input
               className="input w-full"
-              name="boat"
-              placeholder="Nombre de la lancha"
-              value={boat}
-              onChange={(event) => setBoat(event.target.value)}
+              name="origin"
+              value={origin}
+              onChange={(event) => setOrigin(event.target.value)}
+              minLength={2}
+              maxLength={150}
               required
-              pattern=".*\S.*"
             />
           </label>
           <label className="block">
-            <span className="mb-1 block text-sm font-medium">Zona</span>
+            <span className="mb-1 block text-sm font-medium">
+              Zona de destino
+            </span>
             <input
               className="input w-full"
-              name="zone"
-              placeholder="Zona de salida"
-              value={zone}
-              onChange={(event) => setZone(event.target.value)}
-              required
-              pattern=".*\S.*"
-            />
-          </label>
-          <label className="block">
-            <span className="mb-1 block text-sm font-medium">Hora</span>
-            <input
-              className="input w-full"
-              name="time"
-              type="time"
-              value={time}
-              onChange={(event) => setTime(event.target.value)}
+              name="destination"
+              value={destination}
+              onChange={(event) => setDestination(event.target.value)}
+              minLength={2}
+              maxLength={150}
               required
             />
           </label>
-          <p id="empty-return-preview" className="rounded-xl bg-base-200 p-4 text-sm break-words">
-            {message}
-          </p>
+          <div className="grid grid-cols-2 gap-3">
+            <label className="block">
+              <span className="mb-1 block text-sm font-medium">
+                Fecha de salida
+              </span>
+              <input
+                className="input w-full"
+                type="date"
+                min={new Date().toLocaleDateString("en-CA")}
+                value={date}
+                onChange={(event) => setDate(event.target.value)}
+                required
+              />
+            </label>
+            <label className="block">
+              <span className="mb-1 block text-sm font-medium">Hora</span>
+              <input
+                className="input w-full"
+                type="time"
+                value={time}
+                onChange={(event) => setTime(event.target.value)}
+                required
+              />
+            </label>
+          </div>
+          {selectedBoat && (
+            <p className="rounded-xl bg-base-200 p-3 text-sm">
+              El retorno se publicará para {selectedBoat.name}.
+            </p>
+          )}
+          {isLoadingBoats && (
+            <p role="status" className="text-sm">
+              Cargando lanchas…
+            </p>
+          )}
+          {!isLoadingBoats && !boats.length && (
+            <p className="text-sm">
+              No hay lanchas verificadas y activas disponibles para anunciar.
+            </p>
+          )}
+          {error && (
+            <p role="alert" className="text-sm text-error">
+              {error}
+            </p>
+          )}
           <div className="modal-action">
-            <button type="button" className="btn btn-ghost" onClick={onClose}>
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={onClose}
+              disabled={isSaving}
+            >
               Cancelar
             </button>
-            <button type="submit" className="btn btn-error">Enviar</button>
+            <button
+              type="submit"
+              className="btn btn-error"
+              disabled={isLoadingBoats || !boats.length || isSaving}
+            >
+              {isSaving ? "Publicando…" : "Publicar retorno"}
+            </button>
           </div>
         </form>
       </div>

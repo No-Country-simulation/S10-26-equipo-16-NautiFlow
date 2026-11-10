@@ -6,7 +6,7 @@ export type BoatFormData = {
   phone: string;
   name: string;
   capacity: string;
-  zone: string;
+  zone: string[];
   description: string;
 };
 
@@ -35,7 +35,7 @@ export const INITIAL_FORM: BoatFormData = {
   phone: "",
   name: "",
   capacity: "",
-  zone: "Cancún",
+  zone: [],
   description: "",
 };
 
@@ -46,8 +46,6 @@ export const DOCUMENT_TYPES = [
 ] as const;
 
 export type DocumentType = (typeof DOCUMENT_TYPES)[number];
-
-
 
 export type FieldProps = {
   label: string;
@@ -64,7 +62,6 @@ export type UploadZoneProps = {
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   ariaLabel: string;
 };
-
 
 export type ActionButtonProps = {
   children: React.ReactNode;

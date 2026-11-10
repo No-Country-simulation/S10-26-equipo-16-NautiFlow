@@ -1,6 +1,10 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  ArrayMinSize,
+  ArrayUnique,
+  IsArray,
   IsBoolean,
+  IsIn,
   IsInt,
   IsNotEmpty,
   IsOptional,
@@ -9,6 +13,7 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
+import { DELTA_ZONES } from '../../zones/delta-zones';
 
 export class CreateBoatDto {
   @ApiProperty({
@@ -30,13 +35,16 @@ export class CreateBoatDto {
   capacidad: number;
 
   @ApiProperty({
-    example: 'Cartagena',
-    description: 'Zona de cobertura de la embarcación',
+    type: [String],
+    enum: DELTA_ZONES,
+    example: ['Primera Sección del Delta', 'Segunda Sección del Delta'],
+    description: 'Sectores del Delta cubiertos por la embarcación',
   })
-  @IsString()
-  @IsNotEmpty()
-  @MaxLength(100)
-  zonaCobertura: string;
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayUnique()
+  @IsIn(DELTA_ZONES, { each: true })
+  zonaCobertura: string[];
 
   @ApiPropertyOptional({
     example: 'https://ejemplo.com/seguro.pdf',

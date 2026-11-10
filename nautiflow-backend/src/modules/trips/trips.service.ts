@@ -1,14 +1,15 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
-  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Trip, TripStatus } from './entities/trip.entity';
+import { VerificationStatus } from '../boat-operators/entities/boat-operator.entity';
 import { Boat } from '../boat-operators/entities/boat.entity';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { UpdateTripDto } from './dto/update-trip.dto';
+import { Trip, TripStatus } from './entities/trip.entity';
 
 @Injectable()
 export class TripsService {
@@ -21,25 +22,12 @@ export class TripsService {
 
   async create(createTripDto: CreateTripDto): Promise<Trip> {
     if (createTripDto.boatId) {
-      const boat = await this.boatRepository.findOne({
-        where: { id: createTripDto.boatId },
-      });
-
-      if (!boat) {
-        throw new NotFoundException(
-          `La lancha con ID ${createTripDto.boatId} no fue encontrada`,
-        );
-      }
-      if (!boat.activa) {
-        throw new BadRequestException(
-          'La lancha seleccionada no se encuentra activa',
-        );
-      }
-      if (boat.capacidad < createTripDto.pasajeros) {
-        throw new BadRequestException(
-          `La capacidad de la lancha (${boat.capacidad}) es menor que el número de pasajeros (${createTripDto.pasajeros})`,
-        );
-      }
+      const boat = await this.findBoatForAssignment(createTripDto.boatId);
+      this.assertBoatCanServe(
+        boat,
+        createTripDto.pasajeros,
+        createTripDto.zona,
+      );
     }
 
     const trip = this.tripRepository.create(createTripDto);
@@ -47,13 +35,11 @@ export class TripsService {
       ? TripStatus.ASSIGNED
       : TripStatus.PENDING;
 
-    return await this.tripRepository.save(trip);
+    return this.tripRepository.save(trip);
   }
 
   async findAll(): Promise<Trip[]> {
-    return await this.tripRepository.find({
-      relations: { boat: true },
-    });
+    return this.tripRepository.find({ relations: { boat: true } });
   }
 
   async findOne(id: string): Promise<Trip> {
@@ -65,80 +51,80 @@ export class TripsService {
     if (!trip) {
       throw new NotFoundException(`El viaje con ID ${id} no fue encontrado`);
     }
-
     return trip;
   }
 
   async update(id: string, updateTripDto: UpdateTripDto): Promise<Trip> {
     const trip = await this.findOne(id);
-
-    const targetBoatId =
-      updateTripDto.boatId !== undefined ? updateTripDto.boatId : trip.boatId;
-    const targetPassengers =
-      updateTripDto.pasajeros !== undefined
-        ? updateTripDto.pasajeros
-        : trip.pasajeros;
+    const targetBoatId = updateTripDto.boatId ?? trip.boatId;
+    const targetPassengers = updateTripDto.pasajeros ?? trip.pasajeros;
+    const targetZone = updateTripDto.zona ?? trip.zona;
 
     if (targetBoatId) {
-      const boat = await this.boatRepository.findOne({
-        where: { id: targetBoatId },
-      });
-
-      if (!boat) {
-        throw new NotFoundException(
-          `La lancha con ID ${targetBoatId} no fue encontrada`,
-        );
-      }
-      if (!boat.activa) {
-        throw new BadRequestException(
-          'La lancha seleccionada no se encuentra activa',
-        );
-      }
-      if (boat.capacidad < targetPassengers) {
-        throw new BadRequestException(
-          `La capacidad de la lancha (${boat.capacidad}) es insuficiente para los pasajeros (${targetPassengers})`,
-        );
-      }
+      const boat = await this.findBoatForAssignment(targetBoatId);
+      this.assertBoatCanServe(boat, targetPassengers, targetZone);
     }
 
     this.tripRepository.merge(trip, updateTripDto);
-
     if (targetBoatId && trip.estado === TripStatus.PENDING) {
       trip.estado = TripStatus.ASSIGNED;
     }
-
-    return await this.tripRepository.save(trip);
+    return this.tripRepository.save(trip);
   }
 
   async assignBoat(tripId: string, boatId: string): Promise<Trip> {
     const trip = await this.findOne(tripId);
-    const boat = await this.boatRepository.findOne({ where: { id: boatId } });
-
-    if (!boat) {
-      throw new NotFoundException(
-        `La lancha con ID ${boatId} no fue encontrada`,
-      );
-    }
-    if (!boat.activa) {
-      throw new BadRequestException(
-        'La lancha seleccionada no se encuentra activa',
-      );
-    }
-    if (boat.capacidad < trip.pasajeros) {
-      throw new BadRequestException(
-        `La capacidad de la lancha (${boat.capacidad}) es menor que los pasajeros del viaje (${trip.pasajeros})`,
-      );
-    }
+    const boat = await this.findBoatForAssignment(boatId);
+    this.assertBoatCanServe(boat, trip.pasajeros, trip.zona);
 
     trip.boat = boat;
     trip.boatId = boatId;
     trip.estado = TripStatus.ASSIGNED;
-
-    return await this.tripRepository.save(trip);
+    return this.tripRepository.save(trip);
   }
 
   async remove(id: string): Promise<void> {
     const trip = await this.findOne(id);
     await this.tripRepository.remove(trip);
+  }
+
+  private async findBoatForAssignment(boatId: string): Promise<Boat> {
+    const boat = await this.boatRepository.findOne({
+      where: { id: boatId },
+      relations: { boatOperator: true },
+    });
+    if (!boat) {
+      throw new NotFoundException(
+        `La lancha con ID ${boatId} no fue encontrada`,
+      );
+    }
+    return boat;
+  }
+
+  private assertBoatCanServe(
+    boat: Boat,
+    passengers: number,
+    zone?: string | null,
+  ): void {
+    if (!boat.activa) {
+      throw new BadRequestException(
+        'La lancha seleccionada no se encuentra activa',
+      );
+    }
+    if (boat.boatOperator?.estadoVerificacion !== VerificationStatus.VERIFIED) {
+      throw new BadRequestException(
+        'La lancha debe pertenecer a un operador verificado',
+      );
+    }
+    if (boat.capacidad < passengers) {
+      throw new BadRequestException(
+        `La capacidad de la lancha (${boat.capacidad}) es insuficiente para los pasajeros (${passengers})`,
+      );
+    }
+    if (zone && !boat.zonaCobertura.includes(zone)) {
+      throw new BadRequestException(
+        `La lancha no cubre la zona solicitada: ${zone}`,
+      );
+    }
   }
 }

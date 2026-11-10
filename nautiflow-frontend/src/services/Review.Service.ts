@@ -1,31 +1,42 @@
-import { getTrips, saveTrip } from "../components/boatAdmin/tripStorage";
+import axios from "axios";
+import { Api } from "./Api";
 import type { BoatTrip } from "../components/boatAdmin/types";
 
-// Adaptador local: sustituir por endpoints que validen y consuman el token
-// de forma atómica en el servidor para compartir enlaces entre dispositivos.
-export function generateReviewLink(tripId: string) {
-  const trip = getTrips().find((item) => item.id === tripId);
-  if (!trip || trip.status !== "completed" || trip.rating !== null) {
-    throw new Error("Solo puedes generar reseñas de viajes finalizados sin calificación.");
+type IssueReviewTokenResponse = { token: string };
+
+export async function generateReviewLink(tripId: string) {
+  const { data } = await Api.post<IssueReviewTokenResponse>("/reviews/tokens", {
+    tripId,
+  });
+  if (typeof data?.token !== "string" || data.token.length === 0) {
+    throw new Error("El servidor no devolvió un token válido para la reseña.");
   }
-  const token = trip.reviewToken || crypto.randomUUID();
-  if (!trip.reviewToken) {
-    saveTrip({ ...trip, reviewLinkGenerated: true, reviewToken: token });
-  }
-  return `${window.location.origin}/review-trip/${encodeURIComponent(token)}`;
+  return `${window.location.origin}/review-trip/${encodeURIComponent(data.token)}`;
 }
 
-export async function submitReview(token: string, rating: NonNullable<BoatTrip["rating"]>, comment: string) {
-  // Serializa envíos entre pestañas del mismo navegador; la garantía global
-  // de uso único corresponde al futuro backend.
-  return navigator.locks.request(`nautiflow-review:${token}`, () => {
-    const trip = getTrips().find((item) => item.reviewToken === token);
-    if (!trip || trip.status !== "completed" || trip.rating !== null) {
-      throw new Error("Este enlace no es válido o la reseña ya fue enviada.");
+export async function submitReview(
+  token: string,
+  rating: NonNullable<BoatTrip["rating"]>,
+  comment: string,
+) {
+  try {
+    await Api.post("/reviews", {
+      token,
+      rating,
+      ...(comment.trim() ? { comment: comment.trim() } : {}),
+    });
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      const status = error.response.status;
+      if (status === 400 || status === 404 || status === 409) {
+        throw new Error("El enlace no es válido o ya fue utilizado.", {
+          cause: error,
+        });
+      }
     }
-    if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
-      throw new Error("Selecciona una calificación de 1 a 5 estrellas.");
-    }
-    saveTrip({ ...trip, rating, reviewComment: comment.trim(), reviewedAt: new Date().toISOString() });
-  });
+    throw new Error(
+      "No se pudo enviar la reseña. Revisa tu conexión e intenta de nuevo.",
+      { cause: error },
+    );
+  }
 }

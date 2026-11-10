@@ -5,7 +5,7 @@ type RegistrationPayload = {
   phone: string;
   name: string;
   capacity: string;
-  zone: string;
+  zone: string[];
   photos: File[];
   documents: { name: string; file: File }[];
 };
@@ -22,7 +22,7 @@ export const BoatOperatorService = {
   async registerOperatorAndBoat(data: RegistrationPayload) {
     const formattedPhone = data.phone.startsWith("+")
       ? data.phone
-      : `+57${data.phone}`;
+      : `+54${data.phone}`;
 
     const license = data.documents.find((document) =>
       document.name.toLowerCase().includes("licencia"),

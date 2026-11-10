@@ -30,6 +30,9 @@ export class Trip {
   @Column({ type: 'varchar', length: 150 })
   destino: string;
 
+  @Column({ type: 'varchar', length: 80, nullable: true })
+  zona: string | null;
+
   @Column({ type: 'timestamp' })
   fechaHoraSalida: Date;
 

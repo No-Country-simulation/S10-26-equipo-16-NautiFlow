@@ -49,7 +49,7 @@ export class ReviewsService {
       const review = await manager.getRepository(Review).save(
         manager.getRepository(Review).create({
           rating: dto.rating,
-          comment: dto.comment,
+          comment: dto.comment?.trim() ?? '',
           tripId: token.tripId,
         }),
       );

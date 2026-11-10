@@ -6,6 +6,7 @@ export type BoatTrip = {
   date: string;
   time: string;
   zone: string;
+  coverageZone?: string | null;
   capacity?: number;
   status: "completed" | "scheduled" | "unassigned";
   rating: 1 | 2 | 3 | 4 | 5 | null;
