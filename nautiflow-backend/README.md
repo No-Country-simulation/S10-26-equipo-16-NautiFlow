@@ -131,6 +131,16 @@ El login temporal fue reemplazado por un único administrador configurado en el 
 2. Genera `JWT_SECRET` con `node -e "console.log(require('node:crypto').randomBytes(32).toString('base64'))"`.
 3. Genera el hash ejecutando `node scripts/generate-admin-password-hash.cjs` desde `nautiflow-backend`; escribe la contraseña en la terminal (no se mostrará) y copia el valor resultante a `ADMIN_PASSWORD_HASH` en `.env`. Configura también `ADMIN_EMAIL`.
 
-No compartas ni subas el `.env` al repositorio. El backend no inicia si falta alguna de estas variables.
-
 El endpoint `POST /api/v1/auth/login` recibe `{ "email": "...", "password": "..." }`. Usa el `access_token` devuelto como Bearer token. Las rutas de administración requieren JWT válido y rol `admin`.
+
+# Migraciones de base de datos en Railway
+
+En la configuración del servicio de Railway, se establece el comando **Pre-deploy Command** en:
+
+```bash
+yarn migration:run
+```
+
+El comando usa `DATABASE_URL`, aplica solo las migraciones pendientes y termina con error si una migración falla, lo que impide activar ese despliegue. Asegúrate de que el Build Command compile el backend (`yarn build`) y de que el Root Directory del servicio sea `nautiflow-backend`.
+
+Las migraciones se definen en `src/migrations` y se registran en `src/config/database.config.ts`. Agrega una nueva migración por cada cambio de esquema; no actives `synchronize` para producción. Haz un backup antes de desplegar cambios de esquema importantes.
