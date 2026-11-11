@@ -143,4 +143,8 @@ yarn migration:run
 
 El comando usa `DATABASE_URL`, aplica solo las migraciones pendientes y termina con error si una migración falla, lo que impide activar ese despliegue. Asegúrate de que el Build Command compile el backend (`yarn build`) y de que el Root Directory del servicio sea `nautiflow-backend`.
 
-Las migraciones se definen en `src/migrations` y se registran en `src/config/database.config.ts`. Agrega una nueva migración por cada cambio de esquema; no actives `synchronize` para producción. Haz un backup antes de desplegar cambios de esquema importantes.
+La migración `1794415600000-ResetApplicationSchema` elimina todos los datos y objetos de las tablas de NautiFlow (`lancheros`, `boats`, `trips`, `empty_legs`, `reviews`, `review_tokens` y `storage`) y vuelve a crear el esquema actual. No borra el historial de migraciones de TypeORM ni objetos ajenos a la aplicación.
+
+Esta migración destructiva requiere `ALLOW_DESTRUCTIVE_MIGRATION=true`. Configúrala temporalmente en Railway para confirmar el reinicio, despliega y verifica que terminó correctamente; después elimina esa variable. La migración se ejecuta una sola vez. No actives `synchronize` para producción.
+
+Las migraciones se definen en `src/migrations` y se registran en `src/config/database.config.ts`. Agrega una nueva migración por cada cambio de esquema. Haz un backup antes de desplegar cambios de esquema importantes.
