@@ -19,7 +19,6 @@ export default function CreateService() {
   const [time, setTime] = useState("");
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
-  const [zone, setZone] = useState("");
   const [capacity, setCapacity] = useState("");
   const [error, setError] = useState("");
   const [createdTrip, setCreatedTrip] = useState<BoatTrip | null>(null);
@@ -31,12 +30,16 @@ export default function CreateService() {
 
     setError("");
     setCreatedTrip(null);
+    if (!origin || !destination || origin === destination) {
+      setError("Selecciona un origen y un destino distintos.");
+      return;
+    }
     setIsSubmitting(true);
     try {
       const trip = await createApiTrip({
-        origen: origin.trim(),
-        destino: destination.trim(),
-        zona: zone,
+        origen: origin,
+        destino: destination,
+        zona: destination,
         date,
         time,
         capacity: Number(capacity),
@@ -46,7 +49,6 @@ export default function CreateService() {
       setTime("");
       setOrigin("");
       setDestination("");
-      setZone("");
       setCapacity("");
       window.dispatchEvent(new Event("nautiflow:trips-changed"));
     } catch (requestError) {
@@ -70,29 +72,22 @@ export default function CreateService() {
       >
         <label className="block min-w-0">
           <span className="mb-1 block text-sm">Origen</span>
-          <input
-            className="input w-full"
-            required
-            maxLength={150}
-            value={origin}
-            onChange={(event) => setOrigin(event.target.value)}
-          />
+          <select className="select w-full" required value={origin} disabled={isSubmitting}
+            onChange={(event) => {
+              const nextOrigin = event.target.value;
+              setOrigin(nextOrigin);
+              if (nextOrigin === destination) setDestination("");
+            }}>
+            <option value="">Selecciona la zona de origen</option>
+            {DELTA_ZONES.map((item) => <option key={item} value={item}>{item}</option>)}
+          </select>
         </label>
         <label className="block min-w-0">
           <span className="mb-1 block text-sm">Destino</span>
-          <input
-            className="input w-full"
-            required
-            maxLength={150}
-            value={destination}
-            onChange={(event) => setDestination(event.target.value)}
-          />
-        </label>
-        <label className="block min-w-0">
-          <span className="mb-1 block text-sm">Zona del Delta</span>
-          <select className="select w-full" required value={zone} onChange={(event) => setZone(event.target.value)}>
-            <option value="">Selecciona una zona</option>
-            {DELTA_ZONES.map((item) => <option key={item} value={item}>{item}</option>)}
+          <select className="select w-full" required value={destination} disabled={!origin || isSubmitting}
+            onChange={(event) => setDestination(event.target.value)}>
+            <option value="">{origin ? "Selecciona la zona de destino" : "Selecciona primero el origen"}</option>
+            {DELTA_ZONES.filter((item) => item !== origin).map((item) => <option key={item} value={item}>{item}</option>)}
           </select>
         </label>
         <label className="block min-w-0">

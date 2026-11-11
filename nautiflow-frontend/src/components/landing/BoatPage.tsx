@@ -3,6 +3,7 @@ import BoatSearch, { type BoatSearchFilters } from "./BoatSearch";
 import { Star } from "lucide-react";
 import { BoatOperatorService } from "../../services/BoatOperator.Service";
 import { DELTA_ZONES } from "../../constants/deltaZones";
+import AskAvailabilityModal from "./AskAvailabilityModal";
 
 interface Boat {
   id: string | number;
@@ -44,6 +45,7 @@ export default function BoatsPage() {
   const [loading, setLoading] = useState(true);
   const [hasSearched, setHasSearched] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedBoat, setSelectedBoat] = useState<Boat | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -178,8 +180,9 @@ export default function BoatsPage() {
                   <p className="text-sm">Capacidad: {boat.capacity} personas</p>
 
                   <div className="card-actions mt-3">
-                    <button type="button" className="btn btn-primary w-full">
-                      Ver detalles
+                    <button type="button" className="btn btn-primary w-full" aria-haspopup="dialog"
+                      onClick={() => setSelectedBoat(boat)}>
+                      Preguntar disponibilidad
                     </button>
                   </div>
                 </div>
@@ -188,6 +191,9 @@ export default function BoatsPage() {
           </div>
         )}
       </section>
+      {selectedBoat && (
+        <AskAvailabilityModal boatName={selectedBoat.name} onClose={() => setSelectedBoat(null)} />
+      )}
     </main>
   );
 }

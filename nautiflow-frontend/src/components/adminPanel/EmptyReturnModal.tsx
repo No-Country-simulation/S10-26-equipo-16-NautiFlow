@@ -5,6 +5,7 @@ import {
   getAvailableBoats,
 } from "../../services/EmptyLegs.Service";
 import type { AvailableBoat } from "../../services/EmptyLegs.Service";
+import { DELTA_ZONES } from "../../constants/deltaZones";
 
 type EmptyReturnModalProps = {
   onClose: () => void;
@@ -49,6 +50,10 @@ export default function EmptyReturnModal({
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+    if (origin === destination) {
+      setError("La zona de destino debe ser distinta de la zona de origen.");
+      return;
+    }
     setIsSaving(true);
     try {
       await createEmptyLeg({
@@ -107,29 +112,41 @@ export default function EmptyReturnModal({
             <span className="mb-1 block text-sm font-medium">
               Zona de origen
             </span>
-            <input
-              className="input w-full"
+            <select
+              className="select w-full"
               name="origin"
               value={origin}
-              onChange={(event) => setOrigin(event.target.value)}
-              minLength={2}
-              maxLength={150}
+              onChange={(event) => {
+                const nextOrigin = event.target.value;
+                setOrigin(nextOrigin);
+                if (nextOrigin === destination) setDestination("");
+              }}
+              disabled={isSaving}
               required
-            />
+            >
+              <option value="">Selecciona la zona de origen</option>
+              {DELTA_ZONES.map((zone) => (
+                <option key={zone} value={zone}>{zone}</option>
+              ))}
+            </select>
           </label>
           <label className="block">
             <span className="mb-1 block text-sm font-medium">
               Zona de destino
             </span>
-            <input
-              className="input w-full"
+            <select
+              className="select w-full"
               name="destination"
               value={destination}
               onChange={(event) => setDestination(event.target.value)}
-              minLength={2}
-              maxLength={150}
+              disabled={!origin || isSaving}
               required
-            />
+            >
+              <option value="">{origin ? "Selecciona la zona de destino" : "Selecciona primero el origen"}</option>
+              {DELTA_ZONES.filter((zone) => zone !== origin).map((zone) => (
+                <option key={zone} value={zone}>{zone}</option>
+              ))}
+            </select>
           </label>
           <div className="grid grid-cols-2 gap-3">
             <label className="block">
