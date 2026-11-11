@@ -1,5 +1,6 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
+import { CreateInitialSchema1794415500000 } from '../migrations/1794415500000-CreateInitialSchema';
 
 export const getDatabaseConfig = (
   configService: ConfigService,
@@ -12,6 +13,8 @@ export const getDatabaseConfig = (
       url: databaseUrl,
       autoLoadEntities: true,
       synchronize: false,
+      migrations: [CreateInitialSchema1794415500000],
+      uuidExtension: 'pgcrypto',
       ssl: {
         rejectUnauthorized: false,
       },
@@ -28,5 +31,7 @@ export const getDatabaseConfig = (
     database: configService.get<string>('DB_DATABASE'),
     autoLoadEntities: true,
     synchronize: true,
+    migrations: [CreateInitialSchema1794415500000],
+    uuidExtension: 'pgcrypto',
   };
 };
