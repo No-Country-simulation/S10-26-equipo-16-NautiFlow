@@ -67,11 +67,29 @@ export default function AllServices() {
   return (
     <PageContainer>
       <BackToAdminBtn />
-      <h1 className="mb-4">Todos los servicios</h1>
+      <header className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="tracking-tight">Todos los servicios</h1>
+        {!isLoading && !error && (
+          <span className="badge badge-primary badge-outline px-3 py-3">
+            {visible.length} {visible.length === 1 ? "servicio" : "servicios"}
+          </span>
+        )}
+      </header>
       <ServiceFilters value={filter} onChange={setFilter} />
-      {isLoading && <p role="status">Cargando servicios…</p>}
+      {isLoading && (
+        <div
+          role="status"
+          className="flex items-center gap-3 rounded-2xl border border-base-300 bg-base-100 p-5 text-base-content/70"
+        >
+          <span className="loading loading-spinner loading-sm text-primary" />
+          Cargando servicios…
+        </div>
+      )}
       {error && (
-        <p role="alert" className="text-error">
+        <p
+          role="alert"
+          className="rounded-2xl border border-error/20 bg-error/10 p-4 text-sm text-error"
+        >
           {error}
         </p>
       )}
@@ -86,7 +104,12 @@ export default function AllServices() {
             />
           ))}
           {!visible.length && (
-            <p role="status">No hay servicios para este filtro.</p>
+            <p
+              role="status"
+              className="rounded-2xl border border-base-300 bg-base-100 p-6 text-center text-base-content/70"
+            >
+              No hay servicios para este filtro.
+            </p>
           )}
         </div>
       )}

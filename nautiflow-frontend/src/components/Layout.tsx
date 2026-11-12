@@ -10,16 +10,16 @@ import Review from "../pages/Review";
 
 export default function Layout() {
   return (
-    <main>
+    <main className="flex w-full flex-1 flex-col">
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/admin-login" element={<AdminLogin />} />
-        <Route path="/admin-panel" element={<ProtectedAdminRoute />} />
         <Route path="/all-services" element={<AllServices />} />
         <Route path="/review-trip/:token" element={<Review />} />
         <Route path="/boat-history" element={<BoatHistory />} />
-        <Route path="/boat-register" element={<BoatRegister/>}/>
-        <Route path="*" element={<NotFound/>} />
+        <Route path="/boat-register" element={<BoatRegister />} />
+        <Route path="/admin-panel" element={<ProtectedAdminRoute />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </main>
   );

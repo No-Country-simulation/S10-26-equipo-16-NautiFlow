@@ -1,11 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
+import { Ship } from "lucide-react";
 import {
   createEmptyLeg,
   getAvailableBoats,
 } from "../../services/EmptyLegs.Service";
 import type { AvailableBoat } from "../../services/EmptyLegs.Service";
 import { DELTA_ZONES } from "../../constants/deltaZones";
+
+const controlClass =
+  "select select-bordered w-full focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20";
+const inputClass =
+  "input input-bordered w-full focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20";
 
 type EmptyReturnModalProps = {
   onClose: () => void;
@@ -84,17 +90,22 @@ export default function EmptyReturnModal({
         onClose();
       }}
     >
-      <div className="modal-box max-w-lg">
-        <h2 id="empty-return-title" className="mb-5 text-xl font-semibold">
-          Anunciar regreso vacío
-        </h2>
+      <div className="modal-box max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-lg overflow-y-auto rounded-3xl border border-base-300 bg-base-100 p-5 shadow-2xl sm:p-7">
+        <div className="mb-6 flex items-center gap-3">
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <Ship size={22} aria-hidden="true" />
+          </span>
+          <h2 id="empty-return-title" className="text-xl font-semibold">
+            Anunciar regreso vacío
+          </h2>
+        </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <label className="block">
-            <span className="mb-1 block text-sm font-medium">
+            <span className="mb-1.5 block text-sm font-medium text-base-content/80">
               Lancha verificada
             </span>
             <select
-              className="select w-full"
+              className={controlClass}
               required
               value={boatId}
               onChange={(event) => setBoatId(event.target.value)}
@@ -109,11 +120,11 @@ export default function EmptyReturnModal({
             </select>
           </label>
           <label className="block">
-            <span className="mb-1 block text-sm font-medium">
+            <span className="mb-1.5 block text-sm font-medium text-base-content/80">
               Zona de origen
             </span>
             <select
-              className="select w-full"
+              className={controlClass}
               name="origin"
               value={origin}
               onChange={(event) => {
@@ -126,35 +137,43 @@ export default function EmptyReturnModal({
             >
               <option value="">Selecciona la zona de origen</option>
               {DELTA_ZONES.map((zone) => (
-                <option key={zone} value={zone}>{zone}</option>
+                <option key={zone} value={zone}>
+                  {zone}
+                </option>
               ))}
             </select>
           </label>
           <label className="block">
-            <span className="mb-1 block text-sm font-medium">
+            <span className="mb-1.5 block text-sm font-medium text-base-content/80">
               Zona de destino
             </span>
             <select
-              className="select w-full"
+              className={controlClass}
               name="destination"
               value={destination}
               onChange={(event) => setDestination(event.target.value)}
               disabled={!origin || isSaving}
               required
             >
-              <option value="">{origin ? "Selecciona la zona de destino" : "Selecciona primero el origen"}</option>
+              <option value="">
+                {origin
+                  ? "Selecciona la zona de destino"
+                  : "Selecciona primero el origen"}
+              </option>
               {DELTA_ZONES.filter((zone) => zone !== origin).map((zone) => (
-                <option key={zone} value={zone}>{zone}</option>
+                <option key={zone} value={zone}>
+                  {zone}
+                </option>
               ))}
             </select>
           </label>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <label className="block">
-              <span className="mb-1 block text-sm font-medium">
+              <span className="mb-1.5 block text-sm font-medium text-base-content/80">
                 Fecha de salida
               </span>
               <input
-                className="input w-full"
+                className={inputClass}
                 type="date"
                 min={new Date().toLocaleDateString("en-CA")}
                 value={date}
@@ -163,9 +182,11 @@ export default function EmptyReturnModal({
               />
             </label>
             <label className="block">
-              <span className="mb-1 block text-sm font-medium">Hora</span>
+              <span className="mb-1.5 block text-sm font-medium text-base-content/80">
+                Hora
+              </span>
               <input
-                className="input w-full"
+                className={inputClass}
                 type="time"
                 value={time}
                 onChange={(event) => setTime(event.target.value)}
@@ -174,29 +195,40 @@ export default function EmptyReturnModal({
             </label>
           </div>
           {selectedBoat && (
-            <p className="rounded-xl bg-base-200 p-3 text-sm">
-              El retorno se publicará para {selectedBoat.name}.
-            </p>
+            <div className="rounded-xl border border-primary/20 bg-primary/5 p-3 text-sm text-base-content/80">
+              El retorno se publicará para{" "}
+              <span className="font-semibold text-primary">
+                {selectedBoat.name}
+              </span>
+              .
+            </div>
           )}
           {isLoadingBoats && (
-            <p role="status" className="text-sm">
+            <p
+              role="status"
+              className="flex items-center gap-2 rounded-xl border border-base-300 bg-base-200/60 p-3 text-sm text-base-content/70"
+            >
+              <span className="loading loading-spinner loading-xs text-primary" />
               Cargando lanchas…
             </p>
           )}
           {!isLoadingBoats && !boats.length && (
-            <p className="text-sm">
+            <p className="rounded-xl border border-warning/20 bg-warning/10 p-3 text-sm text-base-content/80">
               No hay lanchas verificadas y activas disponibles para anunciar.
             </p>
           )}
           {error && (
-            <p role="alert" className="text-sm text-error">
+            <p
+              role="alert"
+              className="rounded-xl border border-error/20 bg-error/10 p-3 text-sm text-error"
+            >
               {error}
             </p>
           )}
-          <div className="modal-action">
+          <div className="modal-action flex-col-reverse border-t border-base-300 pt-4 sm:flex-row">
             <button
               type="button"
-              className="btn btn-ghost"
+              className="btn btn-ghost w-full sm:w-auto"
               onClick={onClose}
               disabled={isSaving}
             >
@@ -204,7 +236,7 @@ export default function EmptyReturnModal({
             </button>
             <button
               type="submit"
-              className="btn btn-error"
+              className="btn btn-primary w-full sm:w-auto"
               disabled={isLoadingBoats || !boats.length || isSaving}
             >
               {isSaving ? "Publicando…" : "Publicar retorno"}

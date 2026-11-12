@@ -10,15 +10,15 @@ import AssignBoatModal from "../allServices/AssignBoatModal";
 const STATUS_CONFIG = {
   unassigned: {
     label: "Sin asignar",
-    className: "border-yellow-300 bg-yellow-100 text-yellow-700",
+    className: "border-warning/30 bg-warning/10 text-warning",
   },
   scheduled: {
     label: "Por realizar",
-    className: "border-blue-300 bg-blue-100 text-blue-700",
+    className: "border-primary/20 bg-primary/10 text-primary",
   },
   completed: {
     label: "Finalizado",
-    className: "border-green-300 bg-green-100 text-green-700",
+    className: "border-success/30 bg-success/10 text-success",
   },
 };
 
@@ -89,7 +89,7 @@ export default function BoatHistoryRow({
   }).format(new Date(`${trip.date}T00:00:00Z`));
 
   return (
-    <article className="flex flex-col gap-4 rounded-xl border border-base-300 bg-base-100 p-4">
+    <article className="flex flex-col gap-4 rounded-2xl border border-base-300 bg-base-100 p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md motion-reduce:transition-none sm:p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h3 className="text-lg">
           {boatName ||
@@ -104,28 +104,30 @@ export default function BoatHistoryRow({
       {trip.emptyReturn && (
         <span className="badge badge-outline">Regreso vacío</span>
       )}
-      <dl className="grid grid-cols-2 gap-4 sm:flex sm:flex-wrap sm:gap-8">
-        <div>
-          <dt className="text-sm text-base-content/60">Fecha</dt>
+      <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="min-w-0 rounded-xl bg-base-200/60 p-3">
+          <dt className="text-xs font-medium text-base-content/60">Fecha</dt>
           <dd>
             <time dateTime={trip.date}>{date}</time>
           </dd>
         </div>
-        <div>
-          <dt className="text-sm text-base-content/60">Hora</dt>
+        <div className="min-w-0 rounded-xl bg-base-200/60 p-3">
+          <dt className="text-xs font-medium text-base-content/60">Hora</dt>
           <dd>
             <time dateTime={trip.time}>{trip.time} hs</time>
           </dd>
         </div>
-        <div>
-          <dt className="text-sm text-base-content/60">Zona</dt>
+        <div className="min-w-0 rounded-xl bg-base-200/60 p-3">
+          <dt className="text-xs font-medium text-base-content/60">Zona</dt>
           <dd>
             {trip.zone}
             {trip.coverageZone ? ` · ${trip.coverageZone}` : ""}
           </dd>
         </div>
-        <div>
-          <dt className="text-sm text-base-content/60">Calificación</dt>
+        <div className="min-w-0 rounded-xl bg-base-200/60 p-3">
+          <dt className="text-xs font-medium text-base-content/60">
+            Calificación
+          </dt>
           <dd
             className="flex gap-1 text-amber-500"
             aria-label={

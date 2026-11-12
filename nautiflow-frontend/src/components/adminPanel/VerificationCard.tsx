@@ -20,17 +20,17 @@ const STATUS_CONFIG = {
   pending: {
     label: "Pendiente",
     icon: Clock,
-    className: "border-yellow-300 bg-yellow-100 text-yellow-700",
+    className: "border-warning/30 bg-warning/10 text-warning",
   },
   verified: {
     label: "Verificado",
     icon: BadgeCheck,
-    className: "border-green-300 bg-green-100 text-green-700",
+    className: "border-success/30 bg-success/10 text-success",
   },
   rejected: {
     label: "Rechazado",
     icon: XCircle,
-    className: "border-red-300 bg-red-100 text-red-700",
+    className: "border-error/30 bg-error/10 text-error",
   },
 } satisfies Record<
   VerificationStatus,
@@ -52,7 +52,7 @@ export default function VerificationCard({
   const StatusIcon = status.icon;
 
   return (
-    <article className="card w-full border border-base-300 bg-base-100 shadow-sm transition hover:shadow-md">
+    <article className="card w-full border border-base-300 bg-base-100 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md motion-reduce:transition-none">
       <div className="card-body gap-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">

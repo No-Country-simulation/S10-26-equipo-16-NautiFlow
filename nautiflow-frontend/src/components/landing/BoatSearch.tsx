@@ -22,6 +22,7 @@ export default function BoatSearch({
   const [search, setSearch] = useState("");
   const [zone, setZone] = useState("");
   const [rating, setRating] = useState(0);
+  const hasFilters = search.trim() !== "" || zone !== "" || rating > 0;
 
   const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -48,11 +49,11 @@ export default function BoatSearch({
   return (
     <section
       aria-label="Buscar embarcaciones"
-      className="relative z-10 mx-auto w-full max-w-6xl px-4"
+      className="relative z-10 mx-auto -mt-8 mb-8 w-full max-w-6xl px-4 lg:-mt-10 lg:mb-10"
     >
       <form
         onSubmit={handleSubmit}
-        className="grid grid-cols-1 gap-3 rounded-2xl border border-base-200 bg-base-100 p-4 shadow-xl sm:p-5 lg:grid-cols-[1fr_1fr_1.3fr_auto] lg:items-center lg:gap-0"
+        className="grid grid-cols-1 gap-3 rounded-2xl border border-base-300/70 bg-base-100/95 p-4 shadow-lg shadow-slate-900/10 backdrop-blur-sm sm:p-5 lg:grid-cols-[1fr_1fr_1.3fr_auto] lg:items-center lg:gap-0"
       >
         {/* Zona */}
         <div className="flex min-w-0 items-center gap-3 rounded-xl border border-base-300 px-3 py-2.5 lg:rounded-none lg:border-0 lg:border-r lg:px-4">
@@ -109,7 +110,11 @@ export default function BoatSearch({
               onChange={(event) => setRating(Number(event.target.value))}
               className="select select-ghost h-auto min-h-0 w-full px-0 py-0 text-sm focus:outline-none"
             >
-              <option value={0}>Todas </option>
+              <option value={0}>Todas</option>
+              <option value={3}>3 estrellas o más</option>
+              <option value={3.5}>3.5 estrellas o más</option>
+              <option value={4}>4 estrellas o más</option>
+              <option value={4.5}>4.5 estrellas o más</option>
               <option value={4.8}>4.8 estrellas o más</option>
               <option value={4.9}>4.9 estrellas o más</option>
             </select>
@@ -154,16 +159,18 @@ export default function BoatSearch({
             {loading ? "Buscando..." : "Buscar lanchas"}
           </button>
 
-          <button
-            type="button"
-            onClick={handleClear}
-            disabled={loading}
-            className="btn btn-ghost btn-xs gap-1"
-            aria-label="Limpiar filtros"
-          >
-            <X size={15} />
-            Limpiar filtros
-          </button>
+          {hasFilters && (
+            <button
+              type="button"
+              onClick={handleClear}
+              disabled={loading}
+              className="btn btn-ghost btn-xs gap-1"
+              aria-label="Limpiar filtros"
+            >
+              <X size={15} />
+              Limpiar filtros
+            </button>
+          )}
         </div>
       </form>
     </section>
