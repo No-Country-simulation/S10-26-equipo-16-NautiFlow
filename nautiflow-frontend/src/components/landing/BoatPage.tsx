@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import BoatSearch, { type BoatSearchFilters } from "./BoatSearch";
-import { Star } from "lucide-react";
+import { MapPin, Star, UsersRound } from "lucide-react";
 import { BoatOperatorService } from "../../services/BoatOperator.Service";
 import { DELTA_ZONES } from "../../constants/deltaZones";
 import AskAvailabilityModal from "./AskAvailabilityModal";
@@ -36,7 +36,10 @@ interface BoatOperatorApi {
 function normalizeZones(value: string[] | string): string[] {
   return Array.isArray(value)
     ? value
-    : value.split(",").map((zone) => zone.trim()).filter(Boolean);
+    : value
+        .split(",")
+        .map((zone) => zone.trim())
+        .filter(Boolean);
 }
 
 export default function BoatsPage() {
@@ -98,7 +101,9 @@ export default function BoatsPage() {
   }, []);
 
   const handleSearch = (filters: BoatSearchFilters) => {
-    setHasSearched(true);
+    const hasFilters =
+      filters.search !== "" || filters.zone !== "" || filters.rating > 0;
+    setHasSearched(hasFilters);
 
     const results = allBoats.filter((boat) => {
       const term = filters.search.toLocaleLowerCase();
@@ -118,16 +123,20 @@ export default function BoatsPage() {
   };
 
   return (
-    <main className="min-h-screen ">
-      <div className="-mt-2">
-      <BoatSearch onSearch={handleSearch} loading={loading} zones={[...DELTA_ZONES]} />
+    <div className="w-full">
+      <div>
+        <BoatSearch
+          onSearch={handleSearch}
+          loading={loading}
+          zones={[...DELTA_ZONES]}
+        />
       </div>
 
       <section
         id="lanchas"
-        className="mx-auto max-w-6xl scroll-mt-8 px-4 py-12"
+        className="mx-auto max-w-6xl scroll-mt-8 px-4 pb-12 pt-8 sm:pt-10"
       >
-        <h2 className="mb-6 text-2xl font-bold">
+        <h2 className="mb-6 text-2xl font-bold tracking-tight sm:mb-8">
           {hasSearched ? "Resultados de búsqueda" : "Lanchas disponibles"}
         </h2>
 
@@ -143,27 +152,29 @@ export default function BoatsPage() {
           </div>
         ) : boats.length === 0 ? (
           <p className="rounded-xl bg-base-100 p-8 text-center text-base-content/70">
-            No encontramos lancha registradas o con esos filtros.
+            No encontramos lanchas registradas o con esos filtros.
           </p>
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {boats.map((boat) => (
               <article
                 key={boat.id}
-                className="card overflow-hidden border border-base-300 bg-base-100 shadow-sm"
+                className="card group overflow-hidden border border-base-300/80 bg-base-100 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg motion-reduce:transition-none"
               >
-                <figure className="aspect-3/2">
+                <figure className="aspect-[3/2] overflow-hidden bg-base-200">
                   <img
                     src={boat.image}
                     alt={boat.name}
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none"
                   />
                 </figure>
 
-                <div className="card-body gap-2">
+                <div className="card-body gap-3">
                   <div className="flex items-start justify-between gap-2">
-                    <h3 className="card-title">{boat.name}</h3>
-                    <span className="badge badge-warning gap-1">
+                    <h3 className="card-title min-w-0 text-lg font-semibold">
+                      {boat.name}
+                    </h3>
+                    <span className="badge badge-warning shrink-0 gap-1 font-semibold">
                       <Star
                         size={14}
                         aria-hidden="true"
@@ -173,15 +184,35 @@ export default function BoatsPage() {
                     </span>
                   </div>
 
-                  <p className="text-sm text-base-content/70">
-                    {boat.zone.join(", ")} · {boat.captain}
-                  </p>
+                  <div className="space-y-2 text-sm text-base-content/70">
+                    <p className="flex items-center gap-1.5">
+                      <MapPin
+                        size={15}
+                        aria-hidden="true"
+                        className="shrink-0 text-primary"
+                      />
+                      <span className="truncate">{boat.zone.join(", ")}</span>
+                      <span aria-hidden="true">·</span>
+                      <span className="truncate">{boat.captain}</span>
+                    </p>
 
-                  <p className="text-sm">Capacidad: {boat.capacity} personas</p>
+                    <p className="flex items-center gap-1.5 text-base-content">
+                      <UsersRound
+                        size={15}
+                        aria-hidden="true"
+                        className="shrink-0 text-primary"
+                      />
+                      Capacidad: {boat.capacity} personas
+                    </p>
+                  </div>
 
                   <div className="card-actions mt-3">
-                    <button type="button" className="btn btn-primary w-full" aria-haspopup="dialog"
-                      onClick={() => setSelectedBoat(boat)}>
+                    <button
+                      type="button"
+                      className="btn btn-primary w-full"
+                      aria-haspopup="dialog"
+                      onClick={() => setSelectedBoat(boat)}
+                    >
                       Preguntar disponibilidad
                     </button>
                   </div>
@@ -191,9 +222,13 @@ export default function BoatsPage() {
           </div>
         )}
       </section>
+
       {selectedBoat && (
-        <AskAvailabilityModal boatName={selectedBoat.name} onClose={() => setSelectedBoat(null)} />
+        <AskAvailabilityModal
+          boatName={selectedBoat.name}
+          onClose={() => setSelectedBoat(null)}
+        />
       )}
-    </main>
+    </div>
   );
 }
