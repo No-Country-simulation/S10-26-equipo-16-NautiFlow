@@ -11,7 +11,7 @@ export default function UploadZone({
   ariaLabel,
 }: UploadZoneProps) {
   return (
-    <label className="flex min-h-36 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-base-300 bg-base-200/40 px-4 py-6 text-center transition hover:border-primary hover:bg-base-200">
+    <label className="flex min-h-36 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-primary/30 bg-primary/[0.03] px-4 py-6 text-center transition-colors hover:border-primary hover:bg-primary/5 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary">
       {icon ?? <Upload size={24} className="text-primary" />}
 
       <span className="text-sm font-semibold">{title}</span>

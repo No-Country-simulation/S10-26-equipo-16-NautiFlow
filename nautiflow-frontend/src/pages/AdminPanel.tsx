@@ -309,14 +309,14 @@ export default function AdminPanel() {
   }
 
   return (
-    <PageContainer>
-      <div className="w-full min-w-0 lg:pr-80">
-        <div className="min-w-0 lg:pr-6">
+    <PageContainer wide>
+      <div className="w-full min-w-0 xl:pr-80">
+        <div className="min-w-0">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <h1 className="py-2">Administración</h1>
+            <h1 className="py-2 tracking-tight">Administración</h1>
             <button
               type="button"
-              className="btn btn-outline"
+              className="btn btn-ghost btn-sm"
               onClick={handleLogout}
             >
               Cerrar sesión
@@ -324,19 +324,25 @@ export default function AdminPanel() {
           </div>
           <Link
             to="/all-services"
-            className="btn btn-outline mb-4 rounded-full"
+            className="btn btn-outline btn-sm mb-5 rounded-full"
           >
             Todos los servicios
           </Link>
           <CreateService />
           <BoatRequestFilters filters={filters} onChange={setFilters} />
-          <section aria-labelledby="fleet-search-results" className="mb-8">
+          <section
+            aria-labelledby="fleet-search-results"
+            className="mb-8 rounded-2xl border border-base-300/70 bg-base-100/70 p-4 sm:p-5"
+          >
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-              <h2 id="fleet-search-results" className="text-xl font-semibold">
+              <h2
+                id="fleet-search-results"
+                className="text-xl font-semibold tracking-tight"
+              >
                 Resultados de búsqueda
               </h2>
               {!isLoadingFleet && !fleetError && (
-                <span className="text-sm text-base-content/60">
+                <span className="badge badge-ghost">
                   {matchingFleet.length} embarcaciones
                 </span>
               )}
@@ -358,7 +364,7 @@ export default function AdminPanel() {
               </p>
             )}
             {!isLoadingFleet && !fleetError && matchingFleet.length === 0 && (
-              <p className="mb-4 rounded-xl bg-base-100 p-4">
+              <p className="mb-4 rounded-xl border border-base-300 bg-base-100 p-4 text-sm text-base-content/70">
                 No hay embarcaciones que coincidan con los filtros.
               </p>
             )}
@@ -366,7 +372,7 @@ export default function AdminPanel() {
               {matchingFleet.map((boat) => (
                 <article
                   key={boat.id}
-                  className="rounded-xl border border-base-300 bg-base-100 p-4"
+                  className="rounded-xl border border-base-300 bg-base-100 p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md motion-reduce:transition-none"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -385,9 +391,14 @@ export default function AdminPanel() {
                           : "Rechazada"}
                     </span>
                   </div>
-                  <p className="mt-3 text-sm">
-                    {boat.zone.join(", ")} · {boat.capacity} pasajeros
-                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <span className="badge badge-ghost max-w-full gap-1">
+                      {boat.zone.join(", ") || "Sin zona"}
+                    </span>
+                    <span className="badge badge-ghost shrink-0">
+                      {boat.capacity} pasajeros
+                    </span>
+                  </div>
                   <WhatsAppContact
                     phone={boat.phone}
                     boatName={boat.name}
@@ -402,10 +413,13 @@ export default function AdminPanel() {
               ))}
             </div>
           </section>
-          <section aria-labelledby="pending-verifications-title">
+          <section
+            aria-labelledby="pending-verifications-title"
+            className="rounded-2xl border border-base-300/70 bg-base-100/70 p-4 sm:p-5"
+          >
             <h2
               id="pending-verifications-title"
-              className="mb-3 text-xl font-semibold"
+              className="mb-4 text-xl font-semibold tracking-tight"
             >
               Solicitudes pendientes de verificación
             </h2>
@@ -422,7 +436,7 @@ export default function AdminPanel() {
             {!isLoadingVerifications &&
               !verificationError &&
               requests.length === 0 && (
-                <p className="mb-4">
+                <p className="mb-4 rounded-xl border border-base-300 bg-base-100 p-4 text-sm text-base-content/70">
                   No hay operadores pendientes de verificación.
                 </p>
               )}
@@ -443,10 +457,10 @@ export default function AdminPanel() {
           </section>
         </div>
 
-        <div className="mt-6 flex min-h-0 flex-col gap-3 rounded-xl bg-tertiary p-3 lg:fixed lg:inset-y-0 lg:top-16 lg:right-0 lg:z-30 lg:mt-0 lg:w-80 lg:rounded-none lg:border-l lg:border-base-300 lg:shadow-lg">
+        <div className="mt-6 flex min-h-0 flex-col gap-3 rounded-2xl border border-base-300/70 bg-base-200/70 p-3 xl:fixed xl:bottom-0 xl:right-0 xl:top-16 xl:z-30 xl:mt-0 xl:w-80 xl:overflow-hidden xl:rounded-none xl:border-y-0 xl:border-r-0 xl:border-l xl:border-base-300 xl:bg-base-100 xl:shadow-lg">
           <button
             type="button"
-            className="btn btn-primary w-full shrink-0 rounded-full"
+            className="btn btn-primary w-full shrink-0 rounded-xl"
             aria-haspopup="dialog"
             onClick={() => setIsEmptyReturnOpen(true)}
           >

@@ -36,12 +36,15 @@ export default function EmptyReturnColumn({
   return (
     <aside
       aria-labelledby="empty-return-column-title"
-      className="flex min-h-0 flex-col rounded-2xl border border-base-300 bg-base-200 p-3 lg:flex-1"
+      className="flex min-h-0 flex-col rounded-2xl border border-base-300 bg-base-100 p-3 xl:flex-1"
     >
-      <h2 id="empty-return-column-title" className="mb-3 shrink-0 text-lg">
+      <h2
+        id="empty-return-column-title"
+        className="mb-3 shrink-0 text-lg font-semibold"
+      >
         Retornos vacíos disponibles
       </h2>
-      <div className="space-y-3 lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain">
+      <div className="space-y-3 xl:min-h-0 xl:flex-1 xl:overflow-y-auto xl:overscroll-contain">
         {isLoading && (
           <p role="status" className="text-sm">
             Cargando retornos…
@@ -59,7 +62,7 @@ export default function EmptyReturnColumn({
             return (
               <article
                 key={leg.id}
-                className="rounded-xl border border-base-300 bg-base-100 p-3"
+                className="rounded-xl border border-base-300 bg-base-100 p-3 transition-colors hover:border-primary/30 hover:bg-base-200/50"
               >
                 <h3 className="font-semibold">{leg.boatName}</h3>
                 <p className="mt-1 text-sm">

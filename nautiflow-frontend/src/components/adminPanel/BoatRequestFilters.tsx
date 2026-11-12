@@ -3,7 +3,7 @@ import type { BoatRequestFiltersProps, BoatRequestFiltersState } from "./types";
 import { DELTA_ZONES } from "../../constants/deltaZones";
 
 const inputClass =
-  "w-full min-w-0 rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-sky-600 focus:ring-2 focus:ring-sky-600/20";
+  "w-full min-w-0 rounded-xl border border-base-300 bg-base-100 px-3 py-2.5 text-sm text-base-content outline-none transition placeholder:text-base-content/40 focus:border-primary focus:ring-2 focus:ring-primary/20";
 
 export default function BoatRequestFilters({
   filters,
@@ -39,17 +39,17 @@ export default function BoatRequestFilters({
   return (
     <section
       aria-label="Filtros para buscar lanchas"
-      className="mb-5 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5"
+      className="mb-6 rounded-2xl border border-base-300/80 bg-base-100 p-4 shadow-sm sm:p-5"
     >
       <div className="mb-4 flex items-center justify-between gap-3">
-        <h2 className="text-base font-semibold text-gray-900">
+        <h2 className="text-base font-semibold text-base-content">
           Buscar lanchas
         </h2>
         {hasFilters && (
           <button
             type="button"
             onClick={clearFilters}
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-sky-700 hover:text-sky-900"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-primary transition hover:text-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
             <X size={14} /> Limpiar filtros
           </button>
@@ -58,14 +58,14 @@ export default function BoatRequestFilters({
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         <label className="block min-w-0">
-          <span className="mb-1.5 block text-xs font-medium text-gray-600">
+          <span className="mb-1.5 block text-xs font-medium text-base-content/70">
             Capitán o embarcación
           </span>
           <div className="relative">
             <Search
               size={17}
               aria-hidden="true"
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-base-content/40"
             />
             <input
               aria-label="Buscar capitán o embarcación"
@@ -79,14 +79,14 @@ export default function BoatRequestFilters({
         </label>
 
         <label className="block min-w-0">
-          <span className="mb-1.5 block text-xs font-medium text-gray-600">
+          <span className="mb-1.5 block text-xs font-medium text-base-content/70">
             Fecha
           </span>
           <div className="relative">
             <CalendarDays
               size={17}
               aria-hidden="true"
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-base-content/40"
             />
             <input
               aria-label="Filtrar fecha"
@@ -99,14 +99,14 @@ export default function BoatRequestFilters({
         </label>
 
         <label className="block min-w-0">
-          <span className="mb-1.5 block text-xs font-medium text-gray-600">
+          <span className="mb-1.5 block text-xs font-medium text-base-content/70">
             Horario
           </span>
           <div className="relative">
             <Clock
               size={17}
               aria-hidden="true"
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-base-content/40"
             />
             <input
               aria-label="Filtrar horario"
@@ -119,14 +119,14 @@ export default function BoatRequestFilters({
         </label>
 
         <label className="block min-w-0">
-          <span className="mb-1.5 block text-xs font-medium text-gray-600">
+          <span className="mb-1.5 block text-xs font-medium text-base-content/70">
             Capacidad mínima
           </span>
           <div className="relative">
             <Users
               size={17}
               aria-hidden="true"
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-base-content/40"
             />
             <input
               aria-label="Filtrar capacidad mínima"
@@ -142,14 +142,14 @@ export default function BoatRequestFilters({
         </label>
 
         <label className="block min-w-0">
-          <span className="mb-1.5 block text-xs font-medium text-gray-600">
+          <span className="mb-1.5 block text-xs font-medium text-base-content/70">
             Zona
           </span>
           <div className="relative">
             <MapPin
               size={17}
               aria-hidden="true"
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-base-content/40"
             />
             <select
               aria-label="Filtrar zona"
@@ -158,13 +158,17 @@ export default function BoatRequestFilters({
               onChange={(event) => update("zone", event.target.value)}
             >
               <option value="">Todas las zonas</option>
-              {DELTA_ZONES.map((zone) => <option key={zone} value={zone}>{zone}</option>)}
+              {DELTA_ZONES.map((zone) => (
+                <option key={zone} value={zone}>
+                  {zone}
+                </option>
+              ))}
             </select>
           </div>
         </label>
 
         <label className="block min-w-0">
-          <span className="mb-1.5 block text-xs font-medium text-gray-600">
+          <span className="mb-1.5 block text-xs font-medium text-base-content/70">
             Verificación
           </span>
           <select
