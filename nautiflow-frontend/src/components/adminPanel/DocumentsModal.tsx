@@ -31,8 +31,8 @@ export default function DocumentsModal({ boat, onClose }: DocumentsModalProps) {
         if (event.target === event.currentTarget) onClose();
       }}
     >
-      <div className="modal-box max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto rounded-3xl border border-base-300 bg-base-100 p-5 shadow-2xl sm:p-7">
-        <div className="flex items-center gap-3">
+      <div className="modal-box flex max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-2xl flex-col overflow-hidden rounded-3xl border border-base-300 bg-base-100 p-5 shadow-2xl sm:p-7">
+        <div className="flex shrink-0 items-center gap-3">
           <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
             <Ship size={22} aria-hidden="true" />
           </span>
@@ -42,13 +42,13 @@ export default function DocumentsModal({ boat, onClose }: DocumentsModalProps) {
         </div>
         <p
           id="documents-modal-captain"
-          className="mt-4 rounded-xl border border-base-300 bg-base-200/50 px-4 py-3 text-sm text-base-content/70"
+          className="mt-4 shrink-0 rounded-xl border border-base-300 bg-base-200/50 px-4 py-3 text-sm text-base-content/70"
         >
           Capitán: <span className="font-medium text-base-content">{boat.captain}</span>
         </p>
 
         {documents.length ? (
-          <ul className="mt-5 space-y-3">
+          <ul aria-label="Archivos disponibles" className="mt-5 min-h-0 space-y-3 overflow-y-auto overscroll-contain pr-2">
             {documents.map((document) => (
               <li
                 key={`${document.name}-${document.url}`}
@@ -83,7 +83,7 @@ export default function DocumentsModal({ boat, onClose }: DocumentsModalProps) {
           </p>
         )}
 
-        <div className="modal-action border-t border-base-300 pt-4">
+        <div className="modal-action shrink-0 border-t border-base-300 pt-4">
           <button
             type="button"
             className="btn btn-ghost w-full sm:w-auto"
