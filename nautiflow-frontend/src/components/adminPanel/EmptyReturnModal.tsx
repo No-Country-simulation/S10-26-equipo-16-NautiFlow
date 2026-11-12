@@ -32,6 +32,9 @@ export default function EmptyReturnModal({
   const [isLoadingBoats, setIsLoadingBoats] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
+  const [publishedMessage, setPublishedMessage] = useState("");
+  const [copyStatus, setCopyStatus] = useState("");
+  const selectedBoat = boats.find((boat) => boat.id === boatId);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -55,6 +58,7 @@ export default function EmptyReturnModal({
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (isSaving || publishedMessage || !selectedBoat) return;
     setError("");
     if (origin === destination) {
       setError("La zona de destino debe ser distinta de la zona de origen.");
@@ -68,7 +72,9 @@ export default function EmptyReturnModal({
         destination: destination.trim(),
         departure: new Date(`${date}T${time}:00`).toISOString(),
       });
-      onCreated();
+      setPublishedMessage(
+        `Lancha ${selectedBoat.name} vuelve vacía desde la Zona ${origin} a las ${time}hs. ¿Alguien necesita un rescate o envío en ese trayecto?`,
+      );
     } catch {
       setError(
         "No se pudo anunciar el retorno. Verifica que la fecha y hora sean futuras e intenta de nuevo.",
@@ -78,7 +84,20 @@ export default function EmptyReturnModal({
     }
   }
 
-  const selectedBoat = boats.find((boat) => boat.id === boatId);
+  function closeModal() {
+    if (isSaving) return;
+    if (publishedMessage) onCreated();
+    else onClose();
+  }
+
+  async function copyMessage() {
+    try {
+      await navigator.clipboard.writeText(publishedMessage);
+      setCopyStatus("Mensaje copiado al portapapeles.");
+    } catch {
+      setCopyStatus("No se pudo copiar. Puedes seleccionar el mensaje y copiarlo manualmente.");
+    }
+  }
 
   return (
     <dialog
@@ -87,7 +106,7 @@ export default function EmptyReturnModal({
       aria-labelledby="empty-return-title"
       onCancel={(event) => {
         event.preventDefault();
-        onClose();
+        closeModal();
       }}
     >
       <div className="modal-box max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-lg overflow-y-auto rounded-3xl border border-base-300 bg-base-100 p-5 shadow-2xl sm:p-7">
@@ -96,10 +115,26 @@ export default function EmptyReturnModal({
             <Ship size={22} aria-hidden="true" />
           </span>
           <h2 id="empty-return-title" className="text-xl font-semibold">
-            Anunciar regreso vacío
+            {publishedMessage ? "Retorno publicado" : "Anunciar regreso vacío"}
           </h2>
         </div>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {publishedMessage && (
+          <div>
+            <p role="status" className="select-text wrap-break-word rounded-xl bg-base-200 p-4 text-sm">
+              {publishedMessage}
+            </p>
+            <p role="status" className="mt-2 text-sm">{copyStatus}</p>
+            <div className="modal-action flex-wrap">
+              <button type="button" className="btn btn-outline" onClick={copyMessage}>
+                Copiar mensaje
+              </button>
+              <button type="button" className="btn btn-primary" onClick={closeModal}>
+                Cerrar
+              </button>
+            </div>
+          </div>
+        )}
+        <form hidden={Boolean(publishedMessage)} onSubmit={handleSubmit} className="space-y-4">
           <label className="block">
             <span className="mb-1.5 block text-sm font-medium text-base-content/80">
               Lancha verificada
