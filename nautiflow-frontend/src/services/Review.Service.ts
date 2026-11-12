@@ -3,6 +3,7 @@ import { Api } from "./Api";
 import type { BoatTrip } from "../components/boatAdmin/types";
 
 type IssueReviewTokenResponse = { token: string };
+type ReviewTokenStatusResponse = { used: boolean };
 
 export async function generateReviewLink(tripId: string) {
   const { data } = await Api.post<IssueReviewTokenResponse>("/reviews/tokens", {
@@ -12,6 +13,25 @@ export async function generateReviewLink(tripId: string) {
     throw new Error("El servidor no devolvió un token válido para la reseña.");
   }
   return `${window.location.origin}/review-trip/${encodeURIComponent(data.token)}`;
+}
+
+export async function getReviewTokenStatus(token: string) {
+  try {
+    const { data } = await Api.get<ReviewTokenStatusResponse>(
+      `/reviews/tokens/${encodeURIComponent(token)}/status`,
+    );
+    if (typeof data?.used !== "boolean") {
+      throw new Error("El servidor devolvió un estado de reseña inválido.");
+    }
+    return data.used ? "used" : "available";
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      return "invalid";
+    }
+    throw new Error("No se pudo validar el enlace de reseña.", {
+      cause: error,
+    });
+  }
 }
 
 export async function submitReview(

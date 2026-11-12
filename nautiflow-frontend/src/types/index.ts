@@ -1,2 +1,4 @@
 
-export type ChildrenTypes = any;
+import type { ReactNode } from "react";
+
+export type ChildrenTypes = ReactNode;

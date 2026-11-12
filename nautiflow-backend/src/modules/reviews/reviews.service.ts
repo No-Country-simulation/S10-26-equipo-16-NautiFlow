@@ -31,6 +31,12 @@ export class ReviewsService {
     return { token };
   }
 
+  async getTokenStatus(token: string): Promise<{ used: boolean }> {
+    const reviewToken = await this.tokens.findOne({ where: { token } });
+    if (!reviewToken) throw new NotFoundException('Token de reseña inválido');
+    return { used: Boolean(reviewToken.usedAt) };
+  }
+
   async create(dto: CreateReviewDto): Promise<Review> {
     return this.dataSource.transaction(async (manager) => {
       const tokenRepo = manager.getRepository(ReviewToken);

@@ -42,6 +42,24 @@ export class ReviewsController {
     return this.reviewsService.issueToken(dto.tripId);
   }
 
+  @Get('tokens/:token/status')
+  @ApiOperation({
+    summary: 'Consultar el estado de un token de reseña',
+    description:
+      'Indica si el enlace de reseña ya fue utilizado o aún puede responderse.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Estado del token obtenido correctamente.',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'El token de reseña no existe.',
+  })
+  getTokenStatus(@Param('token') token: string) {
+    return this.reviewsService.getTokenStatus(token);
+  }
+
   @Post()
   @ApiOperation({
     summary: 'Crear una reseña',
